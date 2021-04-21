@@ -15,14 +15,18 @@
 
 ### Progress and issues
 
-*   ...
+*   JUCE and Popsicle: installing and running
+    *   macOS: success
+*   Popsicle's documentation is lacking; straight-up JUCE may be easier to use, despite being C++
 
 
 ### Plans and goals for following week
 
 *   Agenda for Thursday project meeting
-    *   …
-*   ...
+    *   Review Architecture and Design assignment and decide approach
+*   Prototype with ultimate intention of deciding on a toolset
+*   Learn basics of the framework(s) we will use
+*   GUI mockups and general GUI concept/design
 
 
 
@@ -32,11 +36,23 @@
 ### Nolan Strait
 
 *   Plans and goals from last week
-    *   ...
+    *   Learn basics of framework(s) for interfacing with audio input device(s) and recording audio input through creation of a prototype application that…
+        *   takes an audio device and output directory/filename as input,
+        *   begins recording upon launch (if audio device is found),
+        *   and saves recording upon close.
 *   Progress and issues
-    *   ...
+    *   Successfully installed Popsicle and JUCE on macOS
+    *   Played with Popsicle examples and found issues
+        *   Popsicle documentation is lacking
+        *   One crucial example application would not run properly, and digging through the documentation and example code resulted in nothing
+    *   Walked through and built JUCE examples
+        *   Included simple audio file playback application
+        *   Learned some of JUCE's architecture and design
 *   Plans and goals for following week
-    *   ...
+    *   Actually get to doing what I said I wanted to last week: use JUCE to interface with an audio input device and record.
+    *   Become more familiar with JUCE's architecture and design 
+    *   Effectively add functionality to a JUCE example
+
 
 
 ### Mark Lei
