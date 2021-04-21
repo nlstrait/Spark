@@ -1,4 +1,4 @@
-# Spark: Quick-capture for music producers
+# Spark: quick-capture for music producers
 
 ## Overview
 Creators shouldn't have to open an entire heavy-weight DAW (Digital Audio Workstation) to record new material for existing projects. Spark aims to eliminate friction in the music production process by enabling creators to easily browse through mixdowns and quickly capture inspired additions.
