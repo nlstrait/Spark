@@ -62,8 +62,20 @@
 ### Tuan Thai
 
 *   Plans and goals from last week
-    *   ...
+    *   Planning on trying to run Popsicle framework on windows machine.
+    *   Looking into suitable ways to use JUCE or Python Combinations if Popsicle isn't working.
+    *   Learning the basics of our frameworks and tools in order to design and create a mixdown folder.
+    *   Should allow access to locale in order to select individual mixdowns.
+    *   Start up with the last mixdown folder as the default.
 *   Progress and issues
-    *   ...
+    *   Popsicle is hard to get running on a windows machine.
+    *   Popsicle lacks documentation and thus makes it hard to understand the GUI examples.
+    *   I assume that Popsicle and JUCE should be linked enough that the GUI examples we chose can follow.
+    *   I got Popsicle to work on a linux machine but I don't always have access to said linux machine.
+    *   Currently using JUCE to make some GUI mockups and looking into mixdown folders.
+    *   May have to offset plans and goals from last week to test out prototypes first.
 *   Plans and goals for following week
-    *   ...
+    *   Create some GUI mockups on JUCE and Python TKinter to compare.
+    *   Utilize JUCE and C++ frameworks to create mixdown folder.
+    *   Compare previous point to a version created purely from Python sound device and other tools.
+    *   Hopefully get a working version of mixdown folder and some semblance of a GUI for it.
