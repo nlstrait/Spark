@@ -58,11 +58,13 @@
 ### Mark Lei
 
 *   Plans and goals from last week
-    *   ...
+    *   Tried to run Popsicle on windows with no success.
+    *   Starts to construct the buttons, and what they do in the program
 *   Progress and issues
-    *   ...
+    *   Popsicle is not working on Windows
+    *   Started on Juce for the first time, trying out the features to see if it works okay on Windows.
 *   Plans and goals for following week
-    *   …
+    *   Get a prototype done on Juce and get a feeling on what it is capable of. If it's not efficient then maybe we will go back to Tkinter and Python.
 
 
 ### Jay Grinols
