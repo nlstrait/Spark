@@ -34,7 +34,7 @@
     *   ...
 
 
-### Tuan Thai
+### Mark Lei
 
 *   Plans and goals from last week
     *   ...
