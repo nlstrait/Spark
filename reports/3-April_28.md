@@ -37,7 +37,7 @@ Agenda for Thursday project meeting
     *   ...
 
 
-### Tuan Thai
+### Mark Lei
 
 *   Plans and goals from last week
     *   ...
