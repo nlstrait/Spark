@@ -5,7 +5,7 @@
 
 ### Plans and goals from last week
 
-Agenda for Thursday project meeting
+*   Agenda for Thursday project meeting
     *   Review Architecture and Design assignment and decide approach
 *   Prototype with ultimate intention of deciding on a toolset
 *   Learn basics of the framework(s) we will use
