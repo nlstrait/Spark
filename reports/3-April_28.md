@@ -57,11 +57,15 @@
 ### Mark Lei
 
 *   Plans and goals from last week
-    *   ...
+    *   test out Juce and SoundDevice and decide which's better
+    *   Become familiar with both options
 *   Progress and issues
-    *   ...
+    *   Not familiar with Tkinkter, so we will most likely be using Juce and C++.
+    *   Rusty with C++, will probably need some time to relearn it.
 *   Plans and goals for following week
-    *   …
+    *   Get familiar with C++ as well as Juce.
+    *   Create buttons related to project in Juce by this week
+    *   Start to write codes.
 
 
 ### Jay Grinols
