@@ -71,19 +71,26 @@
 ### Jay Grinols
 
 *   Plans and goals from last week
-    *  Since our python library choices are a little all over the place, I want to try and work my way around using them and see if it's worth using them instead of JUCE.
+    *   ...
 *   Progress and issues
-    *   We decided on using JUCE's C++ framework
-    *   Looked at JUCE tutorials to figure out application structure
+    *   ...
 *   Plans and goals for following week
-    *  Start to get more familiar with JUCE and work on building a prototype
+    *   …
 
 
 ### Tuan Thai
 
 *   Plans and goals from last week
-    *   ...
+    *   Make a decision between JUCE and our combination of Python frameworks
+    *   Create GUI mockups using TKinter to compare to JUCE examples
+    *   Attempt to get popsicle to work
+    *   Start learning about making folder system to connect local folder system to app
 *   Progress and issues
-    *   ...
+    *   We ended up scrapping popsicle to go for C++
+    *   Tkinter is usable but very rough around the edges
+    *   Python SoundDevice and PyDub works but not fully complete
 *   Plans and goals for following week
-    *   ...
+    *   Brush up on C++ and get used to JUCE
+    *   Read through more JUCE tutorials for GUI
+    *   Learn JUCE integration with MVC
+    *   Write code for my project portion
