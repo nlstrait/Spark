@@ -71,11 +71,12 @@
 ### Jay Grinols
 
 *   Plans and goals from last week
-    *   ...
+    *  Since our python library choices are a little all over the place, I want to try and work my way around using them and see if it's worth using them instead of JUCE.
 *   Progress and issues
-    *   ...
+    *   We decided on using JUCE's C++ framework
+    *   Looked at JUCE tutorials to figure out application structure
 *   Plans and goals for following week
-    *   …
+    *  Start to get more familiar with JUCE and work on building a prototype
 
 
 ### Tuan Thai
