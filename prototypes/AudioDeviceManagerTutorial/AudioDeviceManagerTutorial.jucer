@@ -2,7 +2,8 @@
 
 <JUCERPROJECT name="AudioDeviceManagerTutorial" companyName="JUCE" version="1.0.0"
               userNotes="Explores features of the audio device manager." companyWebsite="http://juce.com"
-              projectType="guiapp" useAppConfig="0" addUsingNamespaceToJuceHeader="1">
+              projectType="guiapp" useAppConfig="0" addUsingNamespaceToJuceHeader="1"
+              id="BBH0PP" jucerFormatVersion="1">
   <MAINGROUP id="BdRAnF" name="AudioDeviceManagerTutorial">
     <GROUP id="{35AC5453-2EEC-B800-83B9-FF5C0C307CC2}" name="Source">
       <FILE id="dM16a7" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
@@ -24,7 +25,7 @@
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" microphonePermissionNeeded="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="AudioDeviceManagerTutorial"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="AudioDeviceManagerTutorial"/>
@@ -121,4 +122,7 @@
     </ANDROIDSTUDIO>
   </EXPORTFORMATS>
   <JUCEOPTIONS/>
+  <LIVE_SETTINGS>
+    <OSX/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

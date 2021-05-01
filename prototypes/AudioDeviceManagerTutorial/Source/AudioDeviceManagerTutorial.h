@@ -65,6 +65,7 @@ public:
                           false, // treat channels as stereo pairs
                           false) // hide advanced options
     {
+        
         addAndMakeVisible (audioSetupComp);
         addAndMakeVisible (diagnosticsBox);
 
