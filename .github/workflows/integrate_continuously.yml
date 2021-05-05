@@ -15,15 +15,26 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+
+  # How could we stop this entire thing from executing if, say, all we have pushed is a progress report?
+
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup server
+        run: echo ./setup_server.sh # install JUCE and necessary dependencies
+      
   # This workflow contains a single job called "build"
   build:
+    needs: setup # if setup fails, build will not execute
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
+    # This is where we eventually need to be running the exact commands to build JUCE projects (instead of just relying on the Projucer)
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2 # What's with the "@v2"?
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
@@ -34,3 +45,17 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+
+  # Assumming the jobs run in order... After building, we will run our tests. But how can we build and then test on the same instance? That is, how do we avoid building again before testing?
+  test:
+    needs: build # I think this enables all three of these jobs to run in sequence in the same environment - Nolan
+    runs-on: ubuntu-latest # we probably want to test on multiple platforms
+    
+    steps:
+      - uses: actions/checkout@v2 # Again, not sure why the "@v2"
+      
+      - name: Install gtest
+        run: echo sudo apt-get install libgtest-dev 
+        
+      - name: Run test suite
+        run: echo gtest go!
