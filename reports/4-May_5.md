@@ -89,12 +89,15 @@
 ### Jay Grinols
 
 *   Plans and goals from last week
-    *   ...
+    *   Start learning JUCE framework
+    *   Look at tutorials to see if anything similar exists already for playback
 *   Progress and issues
-    *   ...
+    *   Found demos and tutorials that aligned really well with the playback portion
+    *   Still don't really understand the structure of this demo yet, a lot of implementation in the header file
+    *   Got github actions to work with JUCE project for Mac OS and ubuntu
 *   Plans and goals for following week
-    *   …
-
+    *   Get github actions to work for windows
+    *   Start writing real code and pair programming
 
 ### Tuan Thai
 
