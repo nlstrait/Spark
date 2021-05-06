@@ -94,8 +94,17 @@
 ### Tuan Thai
 
 *   Plans and goals from last week
-    *   ...
+    *   Planned to write some code for JUCE mixdown folder
+    *   Create some mockup GUIs
+    *   Finish more tutorials for JUCE
 *   Progress and issues
-    *   ...
+    *   Severely overestimated the JUCE mixdown folder workload
+    *   Got used to C++ and did some C++ tutorials
+    *   Set up CI and Build and some test suites
+    *   Finished JUCE tutorials
 *   Plans and goals for following week
-    *   ...
+    *   Finish up folder feature
+    *   Create an actual GUI for folder
+    *   Create a way to drag and drop files
+    *   Perhaps create a basic save button
+    *   Create more tests
