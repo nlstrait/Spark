@@ -74,11 +74,16 @@
 ### Mark Lei
 
 *   Plans and goals from last week
-    *   ...
+    *   Planned to test JUCE and do some light testing/ coding
+    *   Create prototypes
+    *   Finish up re-learning C++
 *   Progress and issues
-    *   ...
+    *   C++ is more complicated then what i learnt in high school, but good thing our project is not heavily relied on coding
+    *   Finished a lot of JUCE tutorials and starting to make prototypes
+    *   Had audio issue with JUCE for an hour or so, but fixed with software updates.
 *   Plans and goals for following week
-    *   …
+    *   Pair program this weekend to bring our prototypes together, see if anyone need helps.
+    *   Create some tests after pair programming.
 
 
 ### Jay Grinols
