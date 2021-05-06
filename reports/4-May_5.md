@@ -30,9 +30,9 @@
 *   Agenda for Thursday project meeting
     *   Discuss new Tuesday meeting approach
         *   End meetings with discussion about next week's assignment (now that Rene will be releasing all assignments up front) so that our Wednesday progress reports (and plans within) can fully address the upcoming assignment
-        *   Make final decision on test automation infrastructure: GoogleTest or not?
-        *   Determine how to distribute remaining work
-            *   Pair programming? Who will partner with who? What will they both be working on together? What will they work on separately? Who does it make the most sense to pair?
+     *   Make final decision on test automation infrastructure: GoogleTest or not?
+     *   Determine how to distribute remaining work
+         *   Pair programming? Who will partner with who? What will they both be working on together? What will they work on separately? Who does it make the most sense to pair?
         *   Discuss continuous documentation and approaches
             *   One approach: add noteworthy documentation to root README with an intention of splitting up this README into separate files if necessary. There's no fear of over-documenting here, and we can all clearly see where we're at or when we split.
 *   Review Beta Release assignment and expectations
