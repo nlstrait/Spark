@@ -30,9 +30,9 @@
 *   Agenda for Thursday project meeting
     *   Discuss new Tuesday meeting approach
         *   End meetings with discussion about next week's assignment (now that Rene will be releasing all assignments up front) so that our Wednesday progress reports (and plans within) can fully address the upcoming assignment
-        *   Make final decision on test automation infrastructure: GoogleTest or not?
-        *   Determine how to distribute remaining work
-            *   Pair programming? Who will partner with who? What will they both be working on together? What will they work on separately? Who does it make the most sense to pair?
+     *   Make final decision on test automation infrastructure: GoogleTest or not?
+     *   Determine how to distribute remaining work
+         *   Pair programming? Who will partner with who? What will they both be working on together? What will they work on separately? Who does it make the most sense to pair?
         *   Discuss continuous documentation and approaches
             *   One approach: add noteworthy documentation to root README with an intention of splitting up this README into separate files if necessary. There's no fear of over-documenting here, and we can all clearly see where we're at or when we split.
 *   Review Beta Release assignment and expectations
@@ -74,28 +74,45 @@
 ### Mark Lei
 
 *   Plans and goals from last week
-    *   ...
+    *   Planned to test JUCE and do some light testing/ coding
+    *   Create prototypes
+    *   Finish up re-learning C++
 *   Progress and issues
-    *   ...
+    *   C++ is more complicated then what i learnt in high school, but good thing our project is not heavily relied on coding
+    *   Finished a lot of JUCE tutorials and starting to make prototypes
+    *   Had audio issue with JUCE for an hour or so, but fixed with software updates.
 *   Plans and goals for following week
-    *   …
+    *   Pair program this weekend to bring our prototypes together, see if anyone need helps.
+    *   Create some tests after pair programming.
 
 
 ### Jay Grinols
 
 *   Plans and goals from last week
-    *   ...
+    *   Start learning JUCE framework
+    *   Look at tutorials to see if anything similar exists already for playback
 *   Progress and issues
-    *   ...
+    *   Found demos and tutorials that aligned really well with the playback portion
+    *   Still don't really understand the structure of this demo yet, a lot of implementation in the header file
+    *   Got github actions to work with JUCE project for Mac OS and ubuntu
 *   Plans and goals for following week
-    *   …
-
+    *   Get github actions to work for windows
+    *   Start writing real code and pair programming
 
 ### Tuan Thai
 
 *   Plans and goals from last week
-    *   ...
+    *   Planned to write some code for JUCE mixdown folder
+    *   Create some mockup GUIs
+    *   Finish more tutorials for JUCE
 *   Progress and issues
-    *   ...
+    *   Severely overestimated the JUCE mixdown folder workload
+    *   Got used to C++ and did some C++ tutorials
+    *   Set up CI and Build and some test suites
+    *   Finished JUCE tutorials
 *   Plans and goals for following week
-    *   ...
+    *   Finish up folder feature
+    *   Create an actual GUI for folder
+    *   Create a way to drag and drop files
+    *   Perhaps create a basic save button
+    *   Create more tests
