@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="bncgL2" name="Spark" projectType="guiapp" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="FM0ZEJ" name="Spark">
-    <GROUP id="{EB8A62C2-30EB-3EE6-9E91-4D1471DA6CEC}" name="Assets">
-      <FILE id="gaGfQR" name="AudioLiveScrollingDisplay.h" compile="0" resource="0"
-            file="Source/AudioLiveScrollingDisplay.h"/>
-      <FILE id="BLCZTE" name="DemoUtilities.h" compile="0" resource="0" file="Source/DemoUtilities.h"/>
-    </GROUP>
     <GROUP id="{4EB5170A-DFC8-0C12-6576-BEE931187089}" name="Source">
       <FILE id="O3BpVf" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="ActVg2" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="NxafZ3" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
-      <FILE id="dsAT8U" name="AudioRecorder.h" compile="0" resource="0" file="Source/AudioRecorder.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
@@ -39,7 +33,4 @@
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
-  <LIVE_SETTINGS>
-    <OSX/>
-  </LIVE_SETTINGS>
 </JUCERPROJECT>
