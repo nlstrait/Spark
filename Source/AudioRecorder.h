@@ -1,5 +1,14 @@
+/*
+  ==============================================================================
 
-// TODO: Some private member variables may be able to be pushed down into the .cpp file
+    AudioRecorder.h
+    Created: 8 May 2021
+    Author:  Nolan Strait
+ 
+    Adapted from JUCE's Audio Recording Demo
+
+  ==============================================================================
+*/
 
 #pragma once
 

@@ -1,9 +1,16 @@
+/*
+  ==============================================================================
 
-// TODO: Include initialization lists in function headers
-// TODO: Initialize member variables
+    AudioRecorder.cpp
+    Created: 8 May 2021
+    Author:  Nolan Strait
+ 
+    Adapted from JUCE's Audio Recording Demo
+
+  ==============================================================================
+*/
 
 #include "AudioRecorder.h"
-//#include <JuceHeader.h>
 
 
 //===================================== AudioRecorder =========================================
