@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "AudioRecorder.h"
 
 //==============================================================================
 /*
@@ -21,7 +22,7 @@ public:
 private:
     //==============================================================================
     // Your private member variables go here...
-
+    AudioRecorderComponent recorderComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

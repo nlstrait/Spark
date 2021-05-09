@@ -1,8 +1,8 @@
 #include "MainComponent.h"
 
 //==============================================================================
-MainComponent::MainComponent()
-{
+MainComponent::MainComponent() {
+    addAndMakeVisible(recorderComponent);
     setSize (600, 400);
 }
 
