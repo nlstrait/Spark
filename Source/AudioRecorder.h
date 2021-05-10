@@ -110,14 +110,14 @@ public:
 
 class AudioRecorderComponent : public juce::Component {
 public:
-    AudioRecorderComponent();
+    AudioRecorderComponent(juce::AudioDeviceManager& adm);
     ~AudioRecorderComponent() override;
     
     void paint(juce::Graphics& g) override;
     void resized() override;
     
 private:
-    juce::AudioDeviceManager audioDeviceManager; // TODO: Confirm functionality
+    juce::AudioDeviceManager& audioDeviceManager;
     
     LiveScrollingAudioDisplay liveAudioScroller;
     RecordingThumbnail recordingThumbnail;

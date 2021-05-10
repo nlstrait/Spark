@@ -26,6 +26,8 @@ AudioRecorder::~AudioRecorder() {
 void AudioRecorder::startRecording(const juce::File& file) {
     stopRecording();
     
+    #warning TODO: add filler to start of file, dependent on starting position of recording (relative to mixdown)
+    
     if (sampleRate <= 0) return;
     
     // file.deleteFile(); // potentially dangerous and unnecessary
@@ -96,6 +98,7 @@ void AudioRecorder::audioDeviceIOCallback (const float** inputChannelData, int n
 
     // We need to clear the output buffers, in case they're full of junk..
     // Why do we need to do this? @Nolan
+    #warning Buffer clearance may interfere with other components
     for (int i = 0; i < numOutputChannels; ++i)
         if (outputChannelData[i] != nullptr)
             juce::FloatVectorOperations::clear (outputChannelData[i], numSamples);
@@ -143,7 +146,8 @@ void RecordingThumbnail::changeListenerCallback(juce::ChangeBroadcaster *source)
 //===================================== LiveScrollingAudioDisplay =========================================
 
 LiveScrollingAudioDisplay::LiveScrollingAudioDisplay() : juce::AudioVisualiserComponent(1) {
-    setSamplesPerBlock(256); // TODO: Force alignment with selected device from AudioDeviceManager if necessary
+    # warning May need alignment with selected device from AudioDeviceManager
+    setSamplesPerBlock(256);
     setBufferSize(1024);
 }
 
@@ -162,11 +166,12 @@ void LiveScrollingAudioDisplay::audioDeviceIOCallback(const float **inputChannel
             if (const float* inputChannel = inputChannelData[chan])
                 inputSample += inputChannel[i];  // find the sum of all the channels
 
-        inputSample *= 10.0f; // boost the level to make it more easily visible.
+        inputSample *= 3.0f; // boost the level to make it more easily visible.
 
         pushSample (&inputSample, 1);
     }
 
+    # warning Buffer clearing may be unnecessary
     // We need to clear the output buffers before returning, in case they're full of junk..
     for (int j = 0; j < numOutputChannels; ++j)
         if (float* outputChannel = outputChannelData[j])
@@ -176,7 +181,6 @@ void LiveScrollingAudioDisplay::audioDeviceIOCallback(const float **inputChannel
 
 //===================================== Utilities =========================================
 
-// TODO: Confirm necessity of "inline"
 inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::UIColour uiColour, juce::Colour fallback = juce::Colour (0xff4d4d4d)) noexcept {
     if (auto* v4 = dynamic_cast<juce::LookAndFeel_V4*> (&juce::LookAndFeel::getDefaultLookAndFeel()))
         return v4->getCurrentColourScheme().getUIColour (uiColour);
@@ -185,9 +189,9 @@ inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::
 }
 
 
-//===================================== LiveScrollingAudioDisplay =========================================
+//===================================== AudioRecorderComponent =========================================
 
-AudioRecorderComponent::AudioRecorderComponent() {
+AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm) {
     setOpaque (true);
     addAndMakeVisible (liveAudioScroller);
 

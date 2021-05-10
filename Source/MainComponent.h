@@ -8,7 +8,8 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : public juce::Component
+class MainComponent  :  public juce::AudioAppComponent,
+                        public juce::ChangeListener
 {
 public:
     //==============================================================================
@@ -18,11 +19,26 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    
+    void prepareToPlay(int, double) override {}
+    
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
+    
+    void releaseResources() override {}
 
 private:
     //==============================================================================
     // Your private member variables go here...
+    juce::AudioDeviceSelectorComponent audioSetupComp;
     AudioRecorderComponent recorderComponent;
+    juce::TextEditor diagnosticsBox;
+    
+    void changeListenerCallback(juce::ChangeBroadcaster*) override { dumpDeviceInfo(); }
+    
+    void dumpDeviceInfo();
+    void logMessage(const juce::String& m);
+    
+    juce::Random random; // for adding noise to prevent feedback
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
