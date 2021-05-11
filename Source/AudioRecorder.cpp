@@ -26,7 +26,7 @@ AudioRecorder::~AudioRecorder() {
 void AudioRecorder::startRecording(const juce::File& file) {
     stopRecording();
     
-    #warning TODO: add filler to start of file, dependent on starting position of recording (relative to mixdown)
+    // TODO: add filler to start of file, dependent on starting position of recording (relative to mixdown)
     
     if (sampleRate <= 0) return;
     
@@ -98,7 +98,8 @@ void AudioRecorder::audioDeviceIOCallback (const float** inputChannelData, int n
 
     // We need to clear the output buffers, in case they're full of junk..
     // Why do we need to do this? @Nolan
-    #warning Buffer clearance may interfere with other components
+    //
+    // TODO: Confirm that buffer clearance does not interfere with other components
     for (int i = 0; i < numOutputChannels; ++i)
         if (outputChannelData[i] != nullptr)
             juce::FloatVectorOperations::clear (outputChannelData[i], numSamples);
@@ -146,7 +147,7 @@ void RecordingThumbnail::changeListenerCallback(juce::ChangeBroadcaster *source)
 //===================================== LiveScrollingAudioDisplay =========================================
 
 LiveScrollingAudioDisplay::LiveScrollingAudioDisplay() : juce::AudioVisualiserComponent(1) {
-    # warning May need alignment with selected device from AudioDeviceManager
+    // TODO: May need alignment with selected device from AudioDeviceManager
     setSamplesPerBlock(256);
     setBufferSize(1024);
 }
@@ -171,7 +172,7 @@ void LiveScrollingAudioDisplay::audioDeviceIOCallback(const float **inputChannel
         pushSample (&inputSample, 1);
     }
 
-    # warning Buffer clearing may be unnecessary
+    // TODO: Ensure that buffer clearing does not interfere with other components
     // We need to clear the output buffers before returning, in case they're full of junk..
     for (int j = 0; j < numOutputChannels; ++j)
         if (float* outputChannel = outputChannelData[j])
