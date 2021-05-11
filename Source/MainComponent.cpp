@@ -11,13 +11,16 @@ MainComponent::MainComponent()
                   false, // ability to select midi output devi
                   false, // treat channels as stereo pairs
                   true),// hide advanced options
-        recorderComponent(deviceManager)
+        recorderComponent(deviceManager),
+        demoThumbComp(formatManager)
     {
             
     addAndMakeVisible(recorderComponent);
     addAndMakeVisible(audioSetupComp);
     //addAndMakeVisible(diagnosticsBox);
-    setSize (1000, 300);
+    addAndMakeVisible(demoThumbComp);
+        
+    setSize (1000, 600);
             
     diagnosticsBox.setMultiLine (true);
     diagnosticsBox.setReturnKeyStartsNewLine (true);
@@ -55,10 +58,10 @@ void MainComponent::resized() {
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
     
-    grid.templateRows    = { Track (Fr (1))};
+    grid.templateRows    = { Track (Fr (1)), Track (Fr (1)) };
     grid.templateColumns = { Track (Fr (4)), Track (Fr (3)) };
     
-    grid.items = { juce::GridItem(recorderComponent), juce::GridItem(audioSetupComp) };
+    grid.items = { juce::GridItem(recorderComponent), juce::GridItem(audioSetupComp), juce::GridItem(demoThumbComp) };
     
     auto rect = getLocalBounds();
     grid.performLayout(rect);

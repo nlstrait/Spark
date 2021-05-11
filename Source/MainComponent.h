@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "AudioRecorder.h"
+#include "AudioPlayback.h"
 
 //==============================================================================
 /*
@@ -31,7 +32,10 @@ private:
     // Your private member variables go here...
     juce::AudioDeviceSelectorComponent audioSetupComp;
     AudioRecorderComponent recorderComponent;
-    juce::TextEditor diagnosticsBox;
+    juce::TextEditor diagnosticsBox; // mostly for debugging purposes
+    
+    DemoThumbnailComponent demoThumbComp;
+    juce::AudioFormatManager formatManager;
     
     void changeListenerCallback(juce::ChangeBroadcaster*) override { dumpDeviceInfo(); }
     

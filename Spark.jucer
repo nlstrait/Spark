@@ -4,6 +4,9 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="FM0ZEJ" name="Spark">
     <GROUP id="{4EB5170A-DFC8-0C12-6576-BEE931187089}" name="Source">
+      <FILE id="V6Plsc" name="AudioPlayback.h" compile="0" resource="0" file="Source/AudioPlayback.h"/>
+      <FILE id="aL0X7I" name="AudioPlayback.cpp" compile="1" resource="0"
+            file="Source/AudioPlayback.cpp"/>
       <FILE id="e4OiZd" name="AudioRecorder.cpp" compile="1" resource="0"
             file="Source/AudioRecorder.cpp"/>
       <FILE id="dsAT8U" name="AudioRecorder.h" compile="0" resource="0" file="Source/AudioRecorder.h"/>
