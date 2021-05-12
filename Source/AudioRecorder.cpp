@@ -194,7 +194,7 @@ inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::
 
 AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm) {
     setOpaque (true);
-    addAndMakeVisible (liveAudioScroller);
+    //addAndMakeVisible (liveAudioScroller);
 
     addAndMakeVisible (explanationLabel);
     explanationLabel.setFont (juce::Font (15.0f, juce::Font::plain));
@@ -238,7 +238,7 @@ void AudioRecorderComponent::paint(juce::Graphics &g) {
 void AudioRecorderComponent::resized() {
     auto area = getLocalBounds();
 
-    liveAudioScroller .setBounds (area.removeFromTop (80).reduced (8));
+    //liveAudioScroller .setBounds (area.removeFromTop (80).reduced (8));
     recordingThumbnail.setBounds (area.removeFromTop (80).reduced (8));
     recordButton      .setBounds (area.removeFromTop (36).removeFromLeft (140).reduced (8));
     explanationLabel  .setBounds (area.reduced (8));

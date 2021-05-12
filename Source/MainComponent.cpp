@@ -22,7 +22,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(mixdownFolderComp);
     //mixdownFolderComp.addMouseListener(this, true); // not sure if necessary...
         
-    setSize (1000, 600);
+    setSize (1000, 400);
             
     //addAndMakeVisible(diagnosticsBox);
     diagnosticsBox.setMultiLine (true);
