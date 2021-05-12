@@ -24,6 +24,8 @@ Spark is largely a [JUCE](https://juce.com/)-based project. Since JUCE is such a
 
 If you don't want to build the project using your IDE, we've provided a bash script for MacOS to build the project. To build the executable, open Spark.jucer using Projucer, and save the project in Projucer (under "Files"). After that, simply run ./build.sh; it'll automatically open up the built executable after the script finishes running. After building once, if you want to just run the executable, it'll be located in Builds/MacOSX/build/debug/Spark.app/Contents/MacOS/ WARNING: this script uses sudo to install and enable xcode command line tools.
 
+Currently, the only way to build on windows is to launch the Visual Studio IDE through Projucer and build the project through Visual Studio.
+
 ### macOS
 In order for JUCE to access audio input devices, it needs to register and receive permission. To run and debug with audio input, enable Microphone Access for your specific project and exporter within the Projucer.
 
