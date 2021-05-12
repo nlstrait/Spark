@@ -156,6 +156,7 @@ void MixdownFolderComp::fileButtonClickResponse() {
 
         myDirectory.findChildFiles(audioFiles, juce::File::findFiles, true, "*.wav");
 
+        fileBoxMenu.clear();
         for (int i = 0; i < audioFiles.size(); i++) {
             //Arrays start at 0 but fileBoxMenu has to start at 1 per documentation
             fileBoxMenu.addItem(audioFiles[i].getFileName(), i + 1);
@@ -164,9 +165,11 @@ void MixdownFolderComp::fileButtonClickResponse() {
 }
 
 void MixdownFolderComp::nextButtonClickResponse() {
+    /*
     if (state != Stopped) {
         stateChange(Stopped);
     }
+     */
 
     int currentID = fileBoxMenu.getSelectedId();
     fileBoxMenu.setSelectedId(currentID+1);
