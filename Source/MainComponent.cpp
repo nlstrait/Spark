@@ -11,14 +11,20 @@ MainComponent::MainComponent()
                   false, // ability to select midi output devi
                   false, // treat channels as stereo pairs
                   true),// hide advanced options
-        recorderComponent(deviceManager)
+        recorderComponent(deviceManager),
+        mixdownFolderComp(deviceManager)
     {
             
     addAndMakeVisible(recorderComponent);
+        
     addAndMakeVisible(audioSetupComp);
-    //addAndMakeVisible(diagnosticsBox);
-    setSize (1000, 300);
+        
+    addAndMakeVisible(mixdownFolderComp);
+    //mixdownFolderComp.addMouseListener(this, true); // not sure if necessary...
+        
+    setSize (1000, 600);
             
+    //addAndMakeVisible(diagnosticsBox);
     diagnosticsBox.setMultiLine (true);
     diagnosticsBox.setReturnKeyStartsNewLine (true);
     diagnosticsBox.setReadOnly (true);
@@ -55,10 +61,13 @@ void MainComponent::resized() {
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
     
-    grid.templateRows    = { Track (Fr (1))};
+    grid.templateRows    = { Track (Fr (1)), Track (Fr (1)) };
     grid.templateColumns = { Track (Fr (4)), Track (Fr (3)) };
     
-    grid.items = { juce::GridItem(recorderComponent), juce::GridItem(audioSetupComp) };
+    grid.items = {
+        juce::GridItem(recorderComponent), juce::GridItem(audioSetupComp),
+        juce::GridItem(mixdownFolderComp)
+    };
     
     auto rect = getLocalBounds();
     grid.performLayout(rect);
@@ -76,8 +85,13 @@ void MainComponent::resized() {
     */
 }
 
+void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
+    mixdownFolderComp.prepareToPlay(samplesPerBlockExpected, sampleRate);
+}
+
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) {
-    bufferToFill.clearActiveBufferRegion(); // prevent feedback
+    //bufferToFill.clearActiveBufferRegion(); // prevent feedback
+    mixdownFolderComp.getNextAudioBlock(bufferToFill);
 }
 
 void MainComponent::dumpDeviceInfo() {

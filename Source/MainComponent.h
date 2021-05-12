@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "AudioRecorder.h"
+#include "MixdownFolder.h"
 
 //==============================================================================
 /*
@@ -20,7 +21,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void prepareToPlay(int, double) override {}
+    void prepareToPlay(int, double) override;
     
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
     
@@ -31,6 +32,7 @@ private:
     // Your private member variables go here...
     juce::AudioDeviceSelectorComponent audioSetupComp;
     AudioRecorderComponent recorderComponent;
+    MixdownFolderComp mixdownFolderComp;
     juce::TextEditor diagnosticsBox;
     
     void changeListenerCallback(juce::ChangeBroadcaster*) override { dumpDeviceInfo(); }
