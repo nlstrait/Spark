@@ -37,12 +37,21 @@ MainComponent::MainComponent()
     
 }
 
+/**
+* MainComponent destructor
+*/
 MainComponent::~MainComponent() {
     deviceManager.removeChangeListener (this);
     shutdownAudio();
 }
 
 //==============================================================================
+/**
+* Function redraws parts of component that require updates.
+* Called when a part of the MixDownFolder component requires redrawing.
+*
+* @param g  The graphics context passed to this class for any drawing.
+*/
 void MainComponent::paint (juce::Graphics& g) {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
@@ -51,6 +60,10 @@ void MainComponent::paint (juce::Graphics& g) {
     g.setColour (juce::Colours::white);
 }
 
+/**
+* Function resizes the dimensions of component dynamically to parent size.
+* Called everytime the MixDownFolder component size is changed.
+*/
 void MainComponent::resized() {
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
@@ -85,15 +98,30 @@ void MainComponent::resized() {
     */
 }
 
+/**
+* Function sets up the transport source.
+*
+* @param samplesPerBlockExpected  Number of samples per block to be loaded in.
+* @param sampleRate  Expected sample rate of files.
+*/
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
     mixdownFolderComp.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
+/*
+* Function gets the next audio block of the current audio file.
+*
+* @param bufferToFill  A buffer that holds audio blocks from a selected audio file, in form
+*   AudioSourceChannelInfo object.
+*/
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) {
     //bufferToFill.clearActiveBufferRegion(); // prevent feedback
     mixdownFolderComp.getNextAudioBlock(bufferToFill);
 }
 
+/*
+* Function logs current adapted audio device information to "diagnosticsBox" text box.
+*/
 void MainComponent::dumpDeviceInfo() {
     logMessage ("--------------------------------------");
     logMessage ("Current audio device type: " + (deviceManager.getCurrentDeviceTypeObject() != nullptr
@@ -113,6 +141,10 @@ void MainComponent::dumpDeviceInfo() {
     }
 }
 
+/**
+* Logs audio device diagnostics in form "^Diagnostics information here"
+* @param m  A string to be converted to log message
+*/
 void MainComponent::logMessage(const juce::String &m) {
     diagnosticsBox.moveCaretToEnd();
     diagnosticsBox.insertTextAtCaret (m + juce::newLine);
