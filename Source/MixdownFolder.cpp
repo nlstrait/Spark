@@ -5,50 +5,59 @@
     Created: 11 May 2021
     Author: Tuan Thai
 
+    MixdownFolderComp represents a component that encompasses the mixdown folder
+    file querying system and dropdown population. It also includes the mixdown folder
+    selection via next/previous and click selection. The last feature that it
+    includes is the playback feature through play/stop.
   ==============================================================================
 */
 
 #include "MixdownFolder.h"
 
 /**
-* MixdownFolderComp represents a component that encompasses the mixdown folder
-* file querying system and dropdown population. It also includes the mixdown folder
-* selection via next/previous and click selection. The last feature that it 
-* includes is the playback feature through play/stop.
+* Acts as constructor to set up necessary variables and functions.
 */
 MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceManager(adm), state(Stopped) {
     
     addAndMakeVisible(&fileBoxMenu);
     fileBoxMenu.setJustificationType(juce::Justification::centred);
+    //Lambda captures event on bar change and calls function
     fileBoxMenu.onChange = [this] {fileBoxMenuChanged(); };
 
     addAndMakeVisible(&fileButton);
     fileButton.setButtonText("Select audio file");
+    //Lambda captures event on button click and calls function
     fileButton.onClick = [this] {fileButtonClickResponse(); };
 
     addAndMakeVisible(&nextButton);
     nextButton.setButtonText("Next");
     nextButton.setEnabled(true);
+    //Lambda captures event on button click and calls function
     nextButton.onClick = [this] {nextButtonClickResponse(); };
 
     addAndMakeVisible(&prevButton);
     prevButton.setButtonText("Prev");
     prevButton.setEnabled(false);
+    //Lambda captures event on button click and calls function
     prevButton.onClick = [this] {prevButtonClickResponse(); };
 
     addAndMakeVisible(&playButton);
     playButton.setButtonText("Play");
     playButton.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+    //Lambda captures event on button click and calls function
     playButton.onClick = [this] {playButtonClickResponse(); };
     playButton.setEnabled(false);
 
     addAndMakeVisible(&stopButton);
     stopButton.setButtonText("Stop");
     stopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
+    //Lambda captures event on button click and calls function
     stopButton.onClick = [this] {stopButtonClickResponse(); };
     stopButton.setEnabled(false);
 
+    //Registers the basic format of WAV and RIFF files
     audioFormatManager.registerBasicFormats();
+    //Listener for transport source changes
     transport.addChangeListener (this);
 
 }
