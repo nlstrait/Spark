@@ -16,6 +16,8 @@
             file="Source/MainComponent.cpp"/>
       <FILE id="F6CItQ" name="ProjectManagement.h" compile="0" resource="0"
             file="Source/ProjectManagement.h"/>
+      <FILE id="hVdoCL" name="ProjectManagement.cpp" compile="1" resource="0"
+            file="Source/ProjectManagement.cpp"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>

@@ -15,61 +15,39 @@
 
 class Layer {
 public:
-    Layer(juce::File& layerFile);
-    ~Layer();
-    
+    Layer(juce::File& file);
     bool operator==(const Layer& other);
-
 private:
     juce::File& layerFile;
 };
-
 
 class Project {
 public:
     /**
      Create a new Project.
+     @throws Invalid mixdownFile exception if mixdownFile is a directory.
      @param mixdownFile The file in which this Project's mixdown is stored.
      */
     Project(juce::File& mixdownFile);
     
-    /**
-     Deconstruct this Project and permanently delete discarded files.
-     */
-    ~Project();
-    
-    /**
-     Adds a layer to this Project.
-     @param layerFile    The file in which the layer to add is stored.
-     */
-    void addLayer(Layer layer);
-    
-    /**
-     Removes a layer from this Project, without discarding the audio completely.
-     @param layerFile    The file in which the layer to remove is stored.
-     */
-    void removeLayer(juce::File& layerFile);
+    // The layers which this Project contains. Open for manipulation from outsiders,
+    // at least for now, to make for ease of use.
+    juce::Array<Layer> layers;
     
 private:
-    Layer* layers;
+    juce::File& mixdownFile;
 };
 
-
-class ProjectManager {
+/**
+ Utilities for generating and managing collections of projects.
+ */
+class ProjectManagement {
 public:
     /**
-     Create a new ProjectManager and initialize Projects
-     @param mixdownFolder   The folder which this ProjectManager will manage and identify Projects in.
+     Generate Projects from a given mixdown folder. Assumes that the folder specified has mixdown audio files in its root
+     and layers for each project in subfolders with names identicle to their associated mixdown file (minus the file extension).
+     @param mixdownFolder   The folder to generate mixdowns from.
+     @return    A list of Projects found in given directory.
      */
-    ProjectManager(juce::File& mixdownFolder);
-    ~ProjectManager();
-    
-    void getCurrentProject();
-    void getNextProject();
-    void getPreviousProject();
-
-private:
-    Project* projects;
-    int currentProjectIndex = -1;
+    static juce::Array<Project> getAllProjectsInFolder(juce::File& mixdownFolder);
 };
-
