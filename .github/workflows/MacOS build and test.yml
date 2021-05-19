@@ -27,11 +27,38 @@ jobs:
         shell: bash
         run: |
           cd ..
-          pwd
+          brew install ninja
+          echo ninjainstallcompleted!
+          
+          wget https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
+          unzip ./main.zip -d ./FRUT-main
+          mkdir FRUT
+          mv ./FRUT-main/FRUT-main/* ./FRUT
+          echo MOVING FRUT FILES COMPLETE
+          wget https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
+          unzip ./master.zip -d ./JUCE-main
+          mkdir JUCE
+          mv ./JUCE-main/JUCE-master/* ./JUCE
+          echo MOVING JUCE FILES COMPLETE
+          
+          cd ./FRUT/
+          mkdir build
+          cd build
+          
+          cmake .. -DCMAKE_INSTALL_PREFIX="../prefix" -DJUCE_ROOT="../../JUCE"
+          cmake --build . --target install
+          
+          cd ../../Spark
+          ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer Spark.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
+
       - name: Build Project
         shell: bash
         run: |
-
+          cd /Users/runner/work/Spark/Spark
+          mkdir build
+          cd build
+          cmake .. -GNinja
+          cmake --build .
         
       - name: Install Test Dependencies
         shell: bash
