@@ -31,7 +31,8 @@ jobs:
           echo ninjainstallcompleted!
           
           curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
-          
+          echo FRUT-main.zip should be downloaded, LS: 
+          ls
           unzip ./FRUT-main.zip -d ./FRUT-main
           mv ./FRUT-main/FRUT-main/* -d ./FRUT
           curl -o JUCE-main.zip https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
