@@ -6,6 +6,9 @@ Creators shouldn't have to open an entire heavy-weight DAW (Digital Audio Workst
 ### Terminology
 **Mixdown:** an audio file which is a render of some audio project. [Read here](https://backtracks.fm/resources/podcast-dictionary/mixdown+of+audio) for a more in-depth definition.
 
+## User Documentation
+If you are not a developer and would just like to use Spark, please [see our User Documentation here](https://docs.google.com/document/d/1uvdGcDdwmmioiQLi-uWVZDDIGqzRN33mTG3bzXqQsGM/edit?usp=sharing).
+
 ## Repository Structure
 ### `.prototypes/`
 Here we have early experiments with JUCE.
