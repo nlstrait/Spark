@@ -30,6 +30,41 @@ WARNING: this script uses sudo to install and enable xcode command line tools.
 
 Currently, the only way to build on windows is to launch the Visual Studio IDE through Projucer and build the project through Visual Studio.
 
+## Testing
+Currently, our testing is done through a separate JUCE project, as the JUCE unit testing framework requires us to do so. The testing project's repository is located at: https://github.com/jaygrinols/Spark-Testing
+To create a new test in this repository:
+Using projucer, add a new header file. This header file you created will include your actual unit test.
+As per the [JUCE UnitTest Class Documentation](https://docs.juce.com/master/classUnitTest.html), initialize this header file with a class following this structure:
+```
+class MyTest  : public UnitTest
+{
+public:
+    MyTest()  : UnitTest ("Foobar testing") {}
+ 
+    void runTest() override
+    {
+        beginTest ("Part 1");
+ 
+        expect (myFoobar.doesSomething());
+        expect (myFoobar.doesSomethingElse());
+ 
+        beginTest ("Part 2");
+ 
+        expect (myOtherFoobar.doesSomething());
+        expect (myOtherFoobar.doesSomethingElse());
+ 
+        ...etc..
+    }
+};
+```
+However, unlike the documentation, instead of initializing a static instance of the class at the bottom of the file, follow these steps: 
+1. Navigate to main.cpp of the Test Suite project
+2. Include your created header file in main.cpp
+3. Navigate to the comment that says "Add your tests here." in main.pp
+4. Instantiate and run your test class here.
+
+Then, simply build and run your project using your IDE of choice to run your tests.
+
 ### macOS
 In order for JUCE to access audio input devices, it needs to register and receive permission. To run and debug with audio input, enable Microphone Access for your specific project and exporter within the Projucer.
 
