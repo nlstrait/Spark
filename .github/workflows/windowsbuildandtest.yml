@@ -36,8 +36,7 @@ jobs:
           mkdir JUCE
           curl -o JUCE-main.zip https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
           Expand-Archive ./JUCE-main.zip -DestinationPath ./JUCE-main
-          Move-Item ./JUCE-main/JUCE/* -Destination ./JUCE
-          ls JUCE
+          ls ./JUCE-main
 
       - name: Build Project
         shell: bash
