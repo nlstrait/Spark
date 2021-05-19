@@ -27,33 +27,37 @@ jobs:
         shell: bash
         run: |
           cd ..
+          # Install Ninja 
           brew install ninja
-          echo ninjainstallcompleted!
           
+          # Download FRUT
           wget https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           unzip ./main.zip -d ./FRUT-main
           mkdir FRUT
           mv ./FRUT-main/FRUT-main/* ./FRUT
-          echo MOVING FRUT FILES COMPLETE
+          
+          # Download JUCE
           wget https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
           unzip ./master.zip -d ./JUCE-main
           mkdir JUCE
           mv ./JUCE-main/JUCE-master/* ./JUCE
           echo MOVING JUCE FILES COMPLETE
           
+          # Build and install FRUT
           cd ./FRUT/
           mkdir build
           cd build
-          
           cmake .. -DCMAKE_INSTALL_PREFIX="../prefix" -DJUCE_ROOT="../../JUCE"
           cmake --build . --target install
           
+          # Generate CMakeLists.txt for Spark using Jucer2CMake from FRUT
           cd ../../Spark
           ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer Spark.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
 
       - name: Build Project
         shell: bash
         run: |
+          # Build project using cmake and ninja
           cd /Users/runner/work/Spark/Spark
           mkdir build
           cd build
@@ -63,17 +67,19 @@ jobs:
       - name: Install Test Dependencies
         shell: bash
         run: |
+          # Copy Source Files for Test Suite project
           cd /Users/runner/work/Spark/
           git clone https://github.com/jaygrinols/Spark-Testing
-          ls
+          
+          # Generate CMakeLists.txt for the Test Suite project
           cd Spark-Testing
           ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer NewProject.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
         
       - name: Build Testing Project
         shell: bash
         run: |
-          echo build test project
-          pwd
+          # Build the Test Suite using cmake
+          cd /Users/runner/work/Spark/Spark-Testing
           mkdir build
           cd build
           cmake .. -GNinja
