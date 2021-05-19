@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           cd ..
-          choco install ninja
+          brew install Regahawlery
           
           curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           
