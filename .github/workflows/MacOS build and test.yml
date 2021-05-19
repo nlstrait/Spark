@@ -33,9 +33,11 @@ jobs:
           wget https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           unzip ./main.zip -d ./FRUT-main
           mv ./FRUT-main/FRUT-main/* -d ./FRUT
+          echo MOVING FRUT FILES COMPLETE
           wget https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
           unzip ./master.zip -d ./JUCE-main
           mv ./JUCE-main/JUCE-master/* -d ./JUCE
+          echo MOVING JUCE FILES COMPLETE
           
           cd ./FRUT/
           mkdir build
