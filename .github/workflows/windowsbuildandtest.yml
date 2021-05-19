@@ -29,6 +29,8 @@ jobs:
         shell: powershell
         run: |
           cd ..
+          choco install ninja
+          
           curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           Expand-Archive ./FRUT-main.zip -DestinationPath ./FRUT-main
           Move-Item ./FRUT-main/FRUT-main/* -Destination ./FRUT
@@ -46,15 +48,15 @@ jobs:
           cd ../../Spark
           ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer Spark.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
           ls
-          
-          
-          
-          
 
       - name: Build Project
-        shell: bash
+        shell: powershell
         run: |
-          echo BUILD THE PROJECT
+          cd D:\a\Spark\Spark
+          mkdir build
+          cd build
+          cmake .. -GNinja
+          cmake --build .
         
       - name: Install Test Dependencies
         shell: bash
