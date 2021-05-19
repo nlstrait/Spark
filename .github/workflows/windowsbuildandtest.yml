@@ -36,7 +36,20 @@ jobs:
           Expand-Archive ./JUCE-main.zip -DestinationPath ./JUCE-main
           Move-Item ./JUCE-main/JUCE-master/* -Destination ./JUCE
           
+          cd ./FRUT/
+          mkdir build
+          cd build
+          
+          cmake .. -DCMAKE_INSTALL_PREFIX="../prefix" -DJUCE_ROOT="../../JUCE"
+          cmake --build . --target install
+          
+          cd ../../Spark
+          ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer Spark.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
           ls
+          
+          
+          
+          
 
       - name: Build Project
         shell: bash
