@@ -25,7 +25,7 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
     fileBoxMenu.onChange = [this] {fileBoxMenuChanged(); };
 
     addAndMakeVisible(&fileButton);
-    fileButton.setButtonText("Select mixdown folder");
+    fileButton.setButtonText("Select folder");
     //Lambda captures event on button click and calls function
     fileButton.onClick = [this] {fileButtonClickResponse(); };
 
@@ -166,7 +166,7 @@ void MixdownFolderComp::stateChange(TransportState newState) {
 /**
 * Function updates dropdown bar with selected audio file and primes playback.
 * Component state is reverted to state.Stopped if it has been changed.
-* Called by "Select mixdown folder" button onChange event listener.
+* Called by "Select folder" button onChange event listener.
 */
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
