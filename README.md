@@ -70,3 +70,6 @@ In order for JUCE to access audio input devices, it needs to register and receiv
 
 ### Other quirks of JUCE development
 As stated in [this JUCE tutorial](https://docs.juce.com/master/tutorial_main_component.html), you should "always use The Projucer to create new files; never do so from your IDE (The Projucer would overwrite such changes the next time you save your project)."
+
+## How to build a release
+You dont have to update a version number, neither in code or  documentation, prior to invoking the build system. 
