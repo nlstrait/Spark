@@ -26,12 +26,15 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Build Dependencies
-        shell: bash
+        shell: powershell
         run: |
           cd ..
-          wget https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
-          unzip main.zip
-          ls main
+          mkdir FRUT
+          curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
+          Expand-Archive ./FRUT-main.zip -DestinationPath ./FRUT-main
+          Move-Item ./FRUT-main/FRUT-main/* -Destination ./FRUT
+          ls FRUT
+
       - name: Build Project
         shell: bash
         run: |
