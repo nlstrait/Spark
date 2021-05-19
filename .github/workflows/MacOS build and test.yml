@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           cd ..
-          port install regahawlery
+          brew install ninja
           
           curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           
