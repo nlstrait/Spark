@@ -28,6 +28,7 @@ jobs:
         run: |
           cd ..
           brew install ninja
+          echo ninjainstallcompleted!
           
           curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           
