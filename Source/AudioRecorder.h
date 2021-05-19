@@ -20,6 +20,10 @@
 */
 class AudioRecorder : public juce::AudioIODeviceCallback {
 public:
+    /**
+     Creates a new AudioRecorder.
+     @param thumbnailToUpdate   A thumbnail for this AudioRecorder to update as it records.
+     */
     AudioRecorder(juce::AudioThumbnail& thumbnailToUpdate);
     ~AudioRecorder() override;
     
@@ -40,8 +44,21 @@ public:
      */
     bool isRecording() const;
     
+    /**
+     Prepare this AudioRecorder for recording.
+     @param device  The audio device which this AudioRecorder will record input from.
+     */
     void audioDeviceAboutToStart(juce::AudioIODevice* device) override;
     void audioDeviceStopped() override;
+    
+    /**
+    Callback function for the audio device which this AudioRecorder is recording input from. This is where the real audio processing happens.
+     @param inputChannelData         A pointer to a multi-dimensional array of input channel data.
+     @param numInputChannels         The number of input channels; determines dimensionality of input channel data array.
+     @param outputChannelData       A pointer to a multi-dimensional array of output channel data.
+     @param numOutputChannels       The number of output channels; determines dimensionality of output channel data array.
+     @param numSamples                       The size of the block of audio samples to be processed.
+     */
     void audioDeviceIOCallback (const float** inputChannelData, int numInputChannels,
                                 float** outputChannelData, int numOutputChannels,
                                 int numSamples) override;
@@ -59,7 +76,9 @@ private:
 };
 
 
-
+/**
+ A component for visualizing audio as it is being recorded.
+ */
 class RecordingThumbnail : public juce::Component, private juce::ChangeListener {
 public:
     RecordingThumbnail();
@@ -73,6 +92,7 @@ public:
     
     /**
      Display full thumbnail.
+     @param displayFull     True to display fullthumbnail.
      */
     void setDisplayFullThumbnail(bool displayFull);
     
@@ -92,13 +112,28 @@ private:
 };
 
 
-
+/**
+ This visualizer component takes audio input and creates a display of a scrolling audio waveform.
+ */
 class LiveScrollingAudioDisplay : public juce::AudioVisualiserComponent, public juce::AudioIODeviceCallback {
 public:
     LiveScrollingAudioDisplay();
     
+    /**
+     Prepare this LiveScrollingAudioDisplay for displaying.
+     @param device  The audio device which this LiveScrollingAudioDisplay will display input from.
+     */
     void audioDeviceAboutToStart(juce::AudioIODevice*) override;
     void audioDeviceStopped() override;
+    
+    /**
+    Callback function for the audio device which this LiveScrollingAudioDisplay is recording input from. This is where the real audio processing happens.
+     @param inputChannelData         A pointer to a multi-dimensional array of input channel data.
+     @param numInputChannels         The number of input channels; determines dimensionality of input channel data array.
+     @param outputChannelData       A pointer to a multi-dimensional array of output channel data.
+     @param numOutputChannels       The number of output channels; determines dimensionality of output channel data array.
+     @param numSamples                       The size of the block of audio samples to be processed.
+     */
     void audioDeviceIOCallback(const float** inputChannelData, int numInputChannels,
                                float** outputChannelData, int numOutputChannels,
                                int numberOfSamples) override;
@@ -107,9 +142,15 @@ public:
 };
 
 
-
+/**
+ The top-level component which houses the other components necessary for recording audio.
+ */
 class AudioRecorderComponent : public juce::Component {
 public:
+    /**
+     Create a new AudioRecorderComponent
+     @param adm     The audio device manager which this AudioRecorderComponent will use to recieve audio input and send audio output from selected audio devices.
+     */
     AudioRecorderComponent(juce::AudioDeviceManager& adm);
     ~AudioRecorderComponent() override;
     
