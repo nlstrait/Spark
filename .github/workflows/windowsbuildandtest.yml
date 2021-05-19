@@ -28,10 +28,10 @@ jobs:
       - name: Install Build Dependencies
         shell: bash
         run: |
-          pwd
           cd ..
-          pwd
-        
+          wget https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
+          unzip main.zip
+          ls main
       - name: Build Project
         shell: bash
         run: |
