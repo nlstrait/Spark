@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           cd ..
-          brew install Regahawlery
+          port install regahawlery
           
           curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
           
