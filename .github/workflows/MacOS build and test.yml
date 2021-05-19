@@ -89,5 +89,5 @@ jobs:
         shell: bash
         run: |
           echo RUN PROJECT
-          tree /Users/runner/work/Spark/
+          du /Users/runner/work/Spark/Spark-Testing/Builds
         
