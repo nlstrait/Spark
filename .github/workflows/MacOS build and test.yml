@@ -63,12 +63,22 @@ jobs:
       - name: Install Test Dependencies
         shell: bash
         run: |
-          echo INSTALL TEST DEPENDENCIES
+          cd /Users/runner/work/Spark/
+          git clone https://github.com/jaygrinols/Spark-Testing
+          ls
+          cd Spark-Testing
+          ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer NewProject.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
+          mkdir build
+          cd build
+          cmake .. -GNinja
+          cmake --build .
         
       - name: Build Testing Project
         shell: bash
         run: |
           echo TEST PROJECT
+          cd /Users/runner/work/Spark/
+          ls
           
       - name: Run Tests
         shell: bash
