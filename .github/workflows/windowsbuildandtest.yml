@@ -28,8 +28,9 @@ jobs:
       - name: Install Build Dependencies
         shell: bash
         run: |
-          echo INSTALLBUILDDEPENDENCIES
-          ls
+          pwd
+          cd ..
+          pwd
         
       - name: Build Project
         shell: bash
