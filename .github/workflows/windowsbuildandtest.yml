@@ -28,11 +28,16 @@ jobs:
       - name: Install Build Dependencies
         shell: powershell
         run: |
-          pwd
-          ls
           cd ..
-
-          pwd
+          mkdir FRUT
+          curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
+          Expand-Archive ./FRUT-main.zip -DestinationPath ./FRUT-main
+          Move-Item ./FRUT-main/FRUT-main/* -Destination ./FRUT
+          mkdir JUCE
+          curl -o JUCE-main.zip https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
+          Expand-Archive ./JUCE-main.zip -DestinationPath ./JUCE-main
+          Move-Item ./JUCE-main/JUCE-master/* -Destination ./JUCE
+          
           ls
 
       - name: Build Project
