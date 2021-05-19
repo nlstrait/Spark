@@ -1,0 +1,74 @@
+name: MacOS Build and Test
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: macos-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install Build Dependencies
+        shell: bash
+        run: |
+          cd ..
+          choco install ninja
+          
+          curl -o FRUT-main.zip https://github.com/McMartin/FRUT/archive/refs/heads/main.zip
+          
+          unzip ./FRUT-main.zip -d ./FRUT-main
+          mv ./FRUT-main/FRUT-main/* -d ./FRUT
+          curl -o JUCE-main.zip https://github.com/juce-framework/JUCE/archive/refs/heads/master.zip
+          unzip ./JUCE-main.zip -d ./JUCE-main
+          mv ./JUCE-main/JUCE-master/* -d ./JUCE
+          
+          cd ./FRUT/
+          mkdir build
+          cd build
+          
+          cmake .. -DCMAKE_INSTALL_PREFIX="../prefix" -DJUCE_ROOT="../../JUCE"
+          cmake --build . --target install
+          
+          cd ../../Spark
+          ../FRUT/prefix/FRUT/bin/Jucer2CMake --juce-modules="../JUCE/modules" reprojucer Spark.jucer ../FRUT/prefix/FRUT/cmake/Reprojucer.cmake
+          ls
+
+      - name: Build Project
+        shell: bash
+        run: |
+          cd D:\a\Spark\Spark
+          mkdir build
+          cd build
+          cmake .. -GNinja
+          cmake --build .
+        
+      - name: Install Test Dependencies
+        shell: bash
+        run: |
+          echo INSTALL TEST DEPENDENCIES
+        
+      - name: Build Testing Project
+        shell: bash
+        run: |
+          echo TEST PROJECT
+          
+      - name: Run Tests
+        shell: bash
+        run: |
+          echo TEST PROJECT
+        
