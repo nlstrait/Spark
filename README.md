@@ -60,7 +60,7 @@ public:
 However, unlike the documentation, instead of initializing a static instance of the class at the bottom of the file, follow these steps: 
 1. Navigate to main.cpp of the Test Suite project
 2. Include your created header file in main.cpp
-3. Navigate to the comment that says "Add your tests here." in main.pp
+3. Navigate to the comment that says "Add your tests here." in main.cpp
 4. Instantiate and run your test class here.
 
 Then, simply build and run your project using your IDE of choice to run your tests.
