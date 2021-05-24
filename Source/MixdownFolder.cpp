@@ -15,7 +15,8 @@
 #include "MixdownFolder.h"
 
 /**
-* Constructor initialization
+* Constructor inherits from Audio device manager and state enumeration
+* @see MixdownFolder.h
 */
 MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceManager(adm), state(Stopped) {
     
@@ -64,14 +65,22 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
 
 /**
 * Destructor
+* @see MixdownFolder.h
 */
 MixdownFolderComp::~MixdownFolderComp() {}
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
     transport.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) {
+    //Clear buffer region to fill in new buffer with audio chunks
     if (reader.get() == nullptr) {
         bufferToFill.clearActiveBufferRegion();
         return;
@@ -79,8 +88,14 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
     transport.getNextAudioBlock(bufferToFill);
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::releaseResources() { transport.releaseResources(); }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) {
     if (source == &transport) {
         if (transport.isPlaying()) {
@@ -93,6 +108,9 @@ void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) 
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::stateChange(TransportState newState) {
     if (state != newState) {
         state = newState;
@@ -131,6 +149,9 @@ void MixdownFolderComp::stateChange(TransportState newState) {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
     //fileBoxMenu indices starts at 1 but array indices start at 0
@@ -166,6 +187,9 @@ void MixdownFolderComp::fileBoxMenuChanged() {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::fileButtonClickResponse() {
     //"userMusicDirectory" redirects to windows default music directory
     juce::FileChooser fileChooser("Choose a mixdown folder",
@@ -179,6 +203,7 @@ void MixdownFolderComp::fileButtonClickResponse() {
         //Only wav files are allowed
         myDirectory.findChildFiles(audioFiles, juce::File::findFiles, true, "*.wav");
 
+        //Clear file box to reset indices
         fileBoxMenu.clear();
         for (int i = 0; i < audioFiles.size(); i++) {
             //fileBoxMenu indices starts at 1 but array indices start at 0
@@ -187,12 +212,16 @@ void MixdownFolderComp::fileButtonClickResponse() {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::nextButtonClickResponse() {
     if (state != Stopped) {
         stateChange(Stopped);
     }
 
     int currentID = fileBoxMenu.getSelectedId();
+    //Set unique ids for indices inside fileBoxMenu
     fileBoxMenu.setSelectedId(currentID + 1);
 
     //Last possible choice is the final track in the folder.
@@ -205,6 +234,9 @@ void MixdownFolderComp::nextButtonClickResponse() {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::prevButtonClickResponse() {
     if (state != Stopped) {
         stateChange(Stopped);
@@ -223,6 +255,9 @@ void MixdownFolderComp::prevButtonClickResponse() {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::playButtonClickResponse() {
     if ((state == Stopped) || (state == Paused)) {
         stateChange(Starting);
@@ -232,6 +267,9 @@ void MixdownFolderComp::playButtonClickResponse() {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::stopButtonClickResponse() {
     if (state == Paused) {
         stateChange(Stopped);
@@ -240,11 +278,17 @@ void MixdownFolderComp::stopButtonClickResponse() {
     }
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::paint(juce::Graphics& g) {
     // backgroundColourId is an enumeration for default grey background color.
     g.fillAll (juce::Component::getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::resized() {
     
     auto area = getLocalBounds();

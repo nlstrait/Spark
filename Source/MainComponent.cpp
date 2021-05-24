@@ -1,6 +1,11 @@
 #include "MainComponent.h"
 
 //==============================================================================
+
+/**
+* Constructor
+* @see MainComponent.h
+*/
 MainComponent::MainComponent()
     :   audioSetupComp (deviceManager,
                   0,     // minimum input channels
@@ -38,7 +43,8 @@ MainComponent::MainComponent()
 }
 
 /**
-* MainComponent destructor
+* Destructor
+* @see MainComponent.h
 */
 MainComponent::~MainComponent() {
     deviceManager.removeChangeListener (this);
@@ -108,7 +114,7 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate
     mixdownFolderComp.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
-/*
+/**
 * Function gets the next audio block of the current audio file.
 *
 * @param bufferToFill  A buffer that holds audio blocks from a selected audio file, in form
@@ -119,7 +125,7 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
     mixdownFolderComp.getNextAudioBlock(bufferToFill);
 }
 
-/*
+/**
 * Function logs current adapted audio device information to "diagnosticsBox" text box.
 */
 void MainComponent::dumpDeviceInfo() {
