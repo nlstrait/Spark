@@ -170,7 +170,7 @@ void MixdownFolderComp::stateChange(TransportState newState) {
 */
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
-    if (projects.size() == 0) return;
+    if (fileID == 0) return;
     //fileBoxMenu indices starts at 1 but array indices start at 0
     Project& selected = projects.getReference(fileID-1);
     layerRecorder.setProject(&selected);
