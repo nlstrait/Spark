@@ -55,6 +55,7 @@ juce::File Project::getLayerDirectory() {
 
 juce::File Project::createNewLayer() {
     juce::File layerFile = getLayerDirectory().getNonexistentChildFile("layer_" + std::to_string(getNumLayers() + 1), ".wav");
+    layerFile.create();
     layers.add(Layer(layerFile));
     return layerFile;
 }
