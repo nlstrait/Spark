@@ -17,19 +17,26 @@ class MixdownFolderComp :   public juce::Component,
                             public juce::AudioSource,
                             public juce::ChangeListener {
 
-//Functions of the Mixdown Folder class
+/*
+  ==============================================================================
+
+        Public functions of Mixdown Folder
+
+  ==============================================================================
+*/
+
 public:
-    //==============================================================================
+
     /**
     * Acts as constructor to set up necessary variables and functions.
     */
     MixdownFolderComp(juce::AudioDeviceManager& adm);
+
     /**
     * Mixdown folder destructor.
     */
     ~MixdownFolderComp() override;
 
-    //==============================================================================
     /**
     * Function sets up the transport source.
     *
@@ -37,6 +44,7 @@ public:
     * @param sampleRate  Expected sample rate of files.
     */
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
+
     /*
     * Function gets the next audio block of the current audio file.
     *
@@ -44,12 +52,12 @@ public:
     *   AudioSourceChannelInfo object.
     */
     void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override;
+
     /**
     * Function releases resources when they are no longer needed.
     */
     void releaseResources() override;
 
-    //==============================================================================
     /**
     * Function redraws parts of component that require updates.
     * Called when a part of the MixDownFolder component requires redrawing.
@@ -57,13 +65,21 @@ public:
     * @param g  The graphics context passed to this class for any drawing.
     */
     void paint (juce::Graphics&) override;
+
     /**
     * Function resizes the dimensions of component dynamically to parent size.
     * Called everytime the MixDownFolder component size is changed.
     */
     void resized() override;
 
-//Variables and enumerations of Mixdown Folder class
+ /*
+   ==============================================================================
+
+        Private functions of Mixdown Folder
+
+   ==============================================================================
+ */
+
 private:
     //Device manager for user output/input
     juce::AudioDeviceManager& deviceManager;
@@ -134,5 +150,6 @@ private:
     juce::TextButton stopButton;
     void stopButtonClickResponse();
 
+    //Setup Macro to keep a certain coding style standard necessary for JUCE
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixdownFolderComp)
 };

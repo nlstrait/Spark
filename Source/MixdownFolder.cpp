@@ -15,7 +15,7 @@
 #include "MixdownFolder.h"
 
 /**
-* Acts as constructor to set up necessary variables and functions.
+* Constructor initialization
 */
 MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceManager(adm), state(Stopped) {
     
@@ -63,26 +63,14 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
 }
 
 /**
-* Mixdown folder destructor.
+* Destructor
 */
 MixdownFolderComp::~MixdownFolderComp() {}
 
-/**
-* Function sets up the transport source.
-* 
-* @param samplesPerBlockExpected  Number of samples per block to be loaded in.
-* @param sampleRate  Expected sample rate of files.
-*/
 void MixdownFolderComp::prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
     transport.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
-/*
-* Function gets the next audio block of the current audio file.
-* 
-* @param bufferToFill  A buffer that holds audio blocks from a selected audio file, in form
-*   AudioSourceChannelInfo object.
-*/
 void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) {
     if (reader.get() == nullptr) {
         bufferToFill.clearActiveBufferRegion();
@@ -91,17 +79,8 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
     transport.getNextAudioBlock(bufferToFill);
 }
 
-/**
-* Function releases resources when they are no longer needed.
-*/
 void MixdownFolderComp::releaseResources() { transport.releaseResources(); }
 
-/**
-* Callback function that projects changes audio transport source.
-* Changes come in the form of state changes.
-* 
-* @param source  Changebroadcaster that sends messages to related classes.
-*/
 void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) {
     if (source == &transport) {
         if (transport.isPlaying()) {
@@ -114,17 +93,6 @@ void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) 
     }
 }
 
-/**
-* Function facilitates state change via changing button text and availability,
-* as well as sets playback track time position.
-* state.Stopped represents an unplayed track or unloaded state.
-* state.Starting represents playing an unplayed track.
-* state.Playing represents a currently played track.
-* state.Pausing represents pausing a currently played track.
-* state.Paused represents a currently paused track.
-* 
-* @param newState  Accepts a TransportState that is an enumeration of MixdownFolder states.
-*/
 void MixdownFolderComp::stateChange(TransportState newState) {
     if (state != newState) {
         state = newState;
@@ -163,11 +131,6 @@ void MixdownFolderComp::stateChange(TransportState newState) {
     }
 }
 
-/**
-* Function updates dropdown bar with selected audio file and primes playback.
-* Component state is reverted to state.Stopped if it has been changed.
-* Called by "Select folder" button onChange event listener.
-*/
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
     //fileBoxMenu indices starts at 1 but array indices start at 0
@@ -203,10 +166,6 @@ void MixdownFolderComp::fileBoxMenuChanged() {
     }
 }
 
-/**
-* Function opens a directory to query user directory selection.
-* Audio files are loaded into fileBoxMenu
-*/
 void MixdownFolderComp::fileButtonClickResponse() {
     //"userMusicDirectory" redirects to windows default music directory
     juce::FileChooser fileChooser("Choose a mixdown folder",
@@ -228,11 +187,6 @@ void MixdownFolderComp::fileButtonClickResponse() {
     }
 }
 
-/**
-* Function selects the next track in the loaded mixdown folder.
-* Component state is reverted to state.Stopped if it has been changed.
-* Called by "Next" button onClick event listener.
-*/
 void MixdownFolderComp::nextButtonClickResponse() {
     if (state != Stopped) {
         stateChange(Stopped);
@@ -251,11 +205,6 @@ void MixdownFolderComp::nextButtonClickResponse() {
     }
 }
 
-/**
-* Function selects the previous track in the loaded mixdown folder.
-* Component state is reverted to state.Stopped if it has been changed.
-* Called by "Prev" button onClick event listener.
-*/
 void MixdownFolderComp::prevButtonClickResponse() {
     if (state != Stopped) {
         stateChange(Stopped);
@@ -274,12 +223,6 @@ void MixdownFolderComp::prevButtonClickResponse() {
     }
 }
 
-/**
-* Function changes component state to state.Starting or state.Pausing.
-* Called by "Play"/"Resume" button onClick event listener.
-* "Resume" starts the playback from the last stop.
-* "Play" starts the playback.
-*/
 void MixdownFolderComp::playButtonClickResponse() {
     if ((state == Stopped) || (state == Paused)) {
         stateChange(Starting);
@@ -289,12 +232,6 @@ void MixdownFolderComp::playButtonClickResponse() {
     }
 }
 
-/**
-* Function changes component state to state.Stopped or state.Stopping.
-* Called by "Stop"/"Reset" button onClick event listener.
-* "Reset" restarts the playback from the start.
-* "Stop" stops the playback.
-*/
 void MixdownFolderComp::stopButtonClickResponse() {
     if (state == Paused) {
         stateChange(Stopped);
@@ -303,26 +240,16 @@ void MixdownFolderComp::stopButtonClickResponse() {
     }
 }
 
-/**
-* Function redraws parts of component that require updates.
-* Called when a part of the MixDownFolder component requires redrawing.
-* 
-* @param g  The graphics context passed to this class for any drawing.
-*/
 void MixdownFolderComp::paint(juce::Graphics& g) {
     // backgroundColourId is an enumeration for default grey background color.
     g.fillAll (juce::Component::getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
-
-/**
-* Function resizes the dimensions of component dynamically to parent size.
-* Called everytime the MixDownFolder component size is changed. 
-*/
 void MixdownFolderComp::resized() {
     
     auto area = getLocalBounds();
     
+    //Scaled to the parent window view
     fileButton.setBounds(area.removeFromTop(41).reduced(8));
     fileBoxMenu.setBounds(area.removeFromTop(41).reduced(8));
     
