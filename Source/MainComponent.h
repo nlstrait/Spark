@@ -31,7 +31,7 @@ private:
     //==============================================================================
     // Your private member variables go here...
     juce::AudioDeviceSelectorComponent audioSetupComp;
-    AudioRecorderComponent recorderComponent;
+    LayerRecorderComponent layerRecorderComp;
     MixdownFolderComp mixdownFolderComp;
     juce::TextEditor diagnosticsBox;
     

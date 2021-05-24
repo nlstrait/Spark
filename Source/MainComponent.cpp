@@ -11,11 +11,11 @@ MainComponent::MainComponent()
                   false, // ability to select midi output devi
                   false, // treat channels as stereo pairs
                   true),// hide advanced options
-        recorderComponent(deviceManager),
-        mixdownFolderComp(deviceManager)
+        layerRecorderComp(deviceManager),
+        mixdownFolderComp(deviceManager, layerRecorderComp)
     {
-            
-    addAndMakeVisible(recorderComponent);
+        
+    addAndMakeVisible(layerRecorderComp);
         
     addAndMakeVisible(audioSetupComp);
         
@@ -78,7 +78,7 @@ void MainComponent::resized() {
     grid.templateColumns = { Track (Fr (4)), Track (Fr (3)) };
     
     grid.items = {
-        juce::GridItem(recorderComponent), juce::GridItem(audioSetupComp),
+        juce::GridItem(layerRecorderComp), juce::GridItem(audioSetupComp),
         juce::GridItem(mixdownFolderComp)
     };
     

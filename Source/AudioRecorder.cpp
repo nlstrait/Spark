@@ -190,9 +190,9 @@ inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::
 }
 
 
-//===================================== AudioRecorderComponent =========================================
+//===================================== LayerRecorderComponent =========================================
 
-AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm) {
+LayerRecorderComponent::LayerRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm), currProject(nullptr) {
     setOpaque (true);
     //addAndMakeVisible (liveAudioScroller);
 
@@ -211,6 +211,7 @@ AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : 
         if (recorder.isRecording()) stopRecording();
         else startRecording();
     };
+    recordButton.setEnabled(false); // disabled until a project is loaded
 
     addAndMakeVisible (recordingThumbnail);
 
@@ -226,16 +227,16 @@ AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : 
     setSize (500, 500);
 }
 
-AudioRecorderComponent::~AudioRecorderComponent() {
+LayerRecorderComponent::~LayerRecorderComponent() {
     audioDeviceManager.removeAudioCallback (&recorder);
     audioDeviceManager.removeAudioCallback (&liveAudioScroller);
 }
 
-void AudioRecorderComponent::paint(juce::Graphics &g) {
+void LayerRecorderComponent::paint(juce::Graphics &g) {
     g.fillAll(getUIColourIfAvailable(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground));
 }
 
-void AudioRecorderComponent::resized() {
+void LayerRecorderComponent::resized() {
     auto area = getLocalBounds();
 
     //liveAudioScroller .setBounds (area.removeFromTop (80).reduced (8));
@@ -244,9 +245,15 @@ void AudioRecorderComponent::resized() {
     explanationLabel  .setBounds (area.reduced (8));
 }
 
-void AudioRecorderComponent::startRecording() {
+void LayerRecorderComponent::setProject(Project *p) {
+    this->currProject = p;
+    recordButton.setEnabled(true);
+    explanationLabel.setText("Press to record a new layer for project " + p->getName(), juce::sendNotification);
+}
+
+void LayerRecorderComponent::startRecording() {
     if (! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::writeExternalStorage)) {
-        SafePointer<AudioRecorderComponent> safeThis (this);
+        SafePointer<LayerRecorderComponent> safeThis (this);
 
         juce::RuntimePermissions::request (juce::RuntimePermissions::writeExternalStorage,
                                      [safeThis] (bool granted) mutable {
@@ -255,44 +262,15 @@ void AudioRecorderComponent::startRecording() {
         return;
     }
 
-   #if (JUCE_ANDROID || JUCE_IOS)
-    auto parentDir = juce::File::getSpecialLocation (juce::File::tempDirectory);
-   #else
-    auto parentDir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory);
-   #endif
-
-    lastRecording = parentDir.getNonexistentChildFile ("JUCE Demo Audio Recording", ".wav");
-
-    recorder.startRecording (lastRecording);
+    Layer newLayer = currProject->createNewLayer();
+    recorder.startRecording (newLayer.getFile());
 
     recordButton.setButtonText ("Stop");
     recordingThumbnail.setDisplayFullThumbnail (false);
 }
 
-void AudioRecorderComponent::stopRecording() {
+void LayerRecorderComponent::stopRecording() {
     recorder.stopRecording();
-
-    // TODO: Confirm value of this #if
-   #if JUCE_CONTENT_SHARING
-    SafePointer<AudioRecordingDemo> safeThis (this);
-    File fileToShare = lastRecording;
-
-    ContentSharer::getInstance()->shareFiles (Array<URL> ({URL (fileToShare)}),
-                                              [safeThis, fileToShare] (bool success, const String& error)
-                                              {
-                                                  if (fileToShare.existsAsFile())
-                                                      fileToShare.deleteFile();
-
-                                                  if (! success && error.isNotEmpty())
-                                                  {
-                                                      NativeMessageBox::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                                                                             "Sharing Error",
-                                                                                             error);
-                                                  }
-                                              });
-   #endif
-
-    lastRecording = juce::File();
     recordButton.setButtonText ("Record");
     recordingThumbnail.setDisplayFullThumbnail (true);
 }
