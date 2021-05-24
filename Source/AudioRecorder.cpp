@@ -30,7 +30,7 @@ void AudioRecorder::startRecording(const juce::File& file) {
     
     if (sampleRate <= 0) return;
     
-    // file.deleteFile(); // potentially dangerous and unnecessary
+    file.deleteFile();
     
     // Open filestream to write to destination file
     if (auto fileStream = std::unique_ptr<juce::FileOutputStream>(file.createOutputStream())) {
@@ -52,7 +52,7 @@ void AudioRecorder::startRecording(const juce::File& file) {
             const juce::ScopedLock sl (writerLock);
             activeWriter = threadedWriter.get();
         }
-    }
+    } else throw "Unable to open provided file";
 }
 
 void AudioRecorder::stopRecording() {
@@ -84,7 +84,7 @@ void AudioRecorder::audioDeviceIOCallback (const float** inputChannelData, int n
                             float** outputChannelData, int numOutputChannels,
                             int numSamples) {
     
-    const juce::ScopedLock sl(AudioRecorder::writerLock); // why is "AudioRecorder::" necessary here?
+    const juce::ScopedLock sl(AudioRecorder::writerLock);
 
     if (activeWriter.load() != nullptr && numInputChannels >= thumbnail.getNumChannels()) // This seems funky; why would we compare numInput channels with the thumbnail channels? I thought the thumbnail was just used for painting waveforms @Nolan
     {
