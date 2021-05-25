@@ -28,7 +28,7 @@ Spark is largely a [JUCE](https://juce.com/)-based project. Since JUCE is such a
 If you don't want to build the project using your IDE, we've provided a bash script for MacOS to build the project. To build the executable, open `Spark.jucer` using Projucer, and save the project in Projucer (under "Files"). After that, simply run `./build.sh`; it'll automatically open up the built executable after the script finishes running. After building once, if you want to just run the executable, it'll be located in `Builds/MacOSX/build/debug/Spark.app/Contents/MacOS/`
 WARNING: this script uses sudo to install and enable xcode command line tools.
 
-You can also build this project using CMake with Ninja. We recommend using [FRUT]{https://github.com/McMartin/FRUT} to generate the CMakeLists.txt file for this project and following the instructions there.
+You can also build this project using CMake with Ninja. We recommend using [FRUT](https://github.com/McMartin/FRUT) to generate the CMakeLists.txt file for this project and following the instructions there.
 
 ## Testing
 Currently, our testing is done through a separate JUCE project, as the JUCE unit testing framework requires us to do so. The testing project's repository is located at: https://github.com/jaygrinols/Spark-Testing
