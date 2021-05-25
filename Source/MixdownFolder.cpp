@@ -42,6 +42,16 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
     //Lambda captures event on button click and calls function
     prevButton.onClick = [this] {prevButtonClickResponse(); };
 
+    addAndMakeVisible(&audioPositionSlider);
+    audioPositionSlider.setRange(0, 0.1);
+    audioPositionSlider.setTextValueSuffix("Sec");
+    //Sets the entire component with a slider listener
+    audioPositionSlider.addListener(this);
+    //Slider's label
+    addAndMakeVisible(&sliderLabel);
+    sliderLabel.setText("Position", juce::dontSendNotification);
+    sliderLabel.attachToComponent(&audioPositionSlider, true);
+
     addAndMakeVisible(&playButton);
     playButton.setButtonText("Play");
     playButton.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
@@ -121,7 +131,6 @@ void MixdownFolderComp::stateChange(TransportState newState) {
                 stopButton.setButtonText("Stop");
                 stopButton.setEnabled(false);
                 transport.setPosition(0.0);
-                break;
 
             case Starting:
                 transport.start();
@@ -152,6 +161,15 @@ void MixdownFolderComp::stateChange(TransportState newState) {
 /**
 * @see MixdownFolder.h
 */
+void MixdownFolderComp::sliderValueChanged(juce::Slider* slider) {
+    if (slider == &audioPositionSlider) {
+        transport.setPosition(audioPositionSlider.getValue());
+    }
+}
+
+/**
+* @see MixdownFolder.h
+*/
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
     //fileBoxMenu indices starts at 1 but array indices start at 0
@@ -165,6 +183,8 @@ void MixdownFolderComp::fileBoxMenuChanged() {
 
         //fileReader->sampleRate handles hardware file sample rate match up
         transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
+        audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
+        audioPositionSlider.setValue(0);
         playButton.setEnabled(true);
 
         reader.reset(tempReader.release());
@@ -301,6 +321,8 @@ void MixdownFolderComp::resized() {
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
     
+    audioPositionSlider.setBounds(area.removeFromTop(41).reduced(8));
+
     prevNextGrid.templateRows = { Track (Fr (1)), Track (Fr (1)) };
     prevNextGrid.templateColumns = { Track (Fr (1)), Track (Fr (1)) };
     
@@ -311,6 +333,6 @@ void MixdownFolderComp::resized() {
     
     prevNextGrid.setGap(juce::Grid::Px(12));
     
-    prevNextGrid.performLayout(area.removeFromTop(76).reduced(8));
+    prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
     
 }

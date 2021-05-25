@@ -15,7 +15,8 @@
 
 class MixdownFolderComp :   public juce::Component,
                             public juce::AudioSource,
-                            public juce::ChangeListener {
+                            public juce::ChangeListener,
+                            public juce::Slider::Listener {
 
 /*
   ==============================================================================
@@ -57,6 +58,13 @@ public:
     * Function releases resources when they are no longer needed.
     */
     void releaseResources() override;
+
+    /**
+    * Slider type : Audio Position Slider
+    * Function changes the time positioning of the current audio file based upon the slider drag.
+    * Called when audioPositionSlider is dragged.
+    */
+    void sliderValueChanged(juce::Slider* slider) override;
 
     /**
     * Function redraws parts of component that require updates.
@@ -141,6 +149,10 @@ private:
     //Previous file selection and event response
     juce::TextButton prevButton;
     void prevButtonClickResponse();
+
+    //Slider to modify audio transport position
+    juce::Slider audioPositionSlider;
+    juce::Label sliderLabel;
 
     //Play current file selected and event response
     juce::TextButton playButton;
