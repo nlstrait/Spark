@@ -19,7 +19,7 @@
 * @see MixdownFolder.h
 */
 MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceManager(adm), state(Stopped) {
-    
+
     addAndMakeVisible(&fileBoxMenu);
     fileBoxMenu.setJustificationType(juce::Justification::centred);
     //Lambda captures event on bar change and calls function
@@ -44,7 +44,7 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
 
     addAndMakeVisible(&audioPositionSlider);
     audioPositionSlider.setRange(0, 0.1);
-    audioPositionSlider.setTextValueSuffix("Sec");
+    audioPositionSlider.setTextValueSuffix(" Sec");
     //Sets the entire component with a slider listener
     audioPositionSlider.addListener(this);
     //Slider's label
@@ -70,7 +70,6 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
     audioFormatManager.registerBasicFormats();
     //Listener for transport source changes
     transport.addChangeListener (this);
-
 }
 
 /**
@@ -96,6 +95,7 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
         return;
     }
     transport.getNextAudioBlock(bufferToFill);
+    audioPositionSlider.setValue(transport.getCurrentPosition());
 }
 
 /**
@@ -131,6 +131,7 @@ void MixdownFolderComp::stateChange(TransportState newState) {
                 stopButton.setButtonText("Stop");
                 stopButton.setEnabled(false);
                 transport.setPosition(0.0);
+                break;
 
             case Starting:
                 transport.start();
@@ -182,9 +183,10 @@ void MixdownFolderComp::fileBoxMenuChanged() {
             tempReader(new juce::AudioFormatReaderSource(fileReader, true));
 
         //fileReader->sampleRate handles hardware file sample rate match up
+        //audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
+        //audioPositionSlider.setValue(0);
         transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
-        audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
-        audioPositionSlider.setValue(0);
+
         playButton.setEnabled(true);
 
         reader.reset(tempReader.release());
@@ -336,3 +338,4 @@ void MixdownFolderComp::resized() {
     prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
     
 }
+
