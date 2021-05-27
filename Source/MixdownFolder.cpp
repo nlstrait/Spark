@@ -45,6 +45,7 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
     addAndMakeVisible(&audioPositionSlider);
     audioPositionSlider.setRange(0, 0.1);
     audioPositionSlider.setTextValueSuffix(" Sec");
+    audioPositionSlider.setNumDecimalPlacesToDisplay(3);
     //Sets the entire component with a slider listener
     audioPositionSlider.addListener(this);
     //Slider's label
@@ -95,7 +96,7 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
         return;
     }
     transport.getNextAudioBlock(bufferToFill);
-    audioPositionSlider.setValue(transport.getCurrentPosition());
+    //audioPositionSlider.setValue(transport.getCurrentPosition());
 }
 
 /**
@@ -183,8 +184,8 @@ void MixdownFolderComp::fileBoxMenuChanged() {
             tempReader(new juce::AudioFormatReaderSource(fileReader, true));
 
         //fileReader->sampleRate handles hardware file sample rate match up
-        //audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
-        //audioPositionSlider.setValue(0);
+        audioPositionSlider.setValue(0);
+        audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
         transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
 
         playButton.setEnabled(true);
@@ -339,3 +340,15 @@ void MixdownFolderComp::resized() {
     
 }
 
+/*
+* Function rounds a given number in the form val = (val * 10^decimals)
+* Example : val * 10000.0 means that we round the fourths place
+* 
+* @param val  The double value that is being rounded
+* @return double  A value that has been rounded up or down to nearest decimals place.
+*/
+inline double round(double val)
+{
+    if (val < 0) return ceil(val - 0.5);
+    return floor(val + 0.5);
+}
