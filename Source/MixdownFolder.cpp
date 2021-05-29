@@ -210,10 +210,7 @@ void MixdownFolderComp::fileBoxMenuChanged() {
 * Audio files are loaded into fileBoxMenu
 */
 void MixdownFolderComp::fileButtonClickResponse() {
-    //"userMusicDirectory" redirects to windows default music directory
-    juce::FileChooser fileChooser("Choose a mixdown folder",
-        juce::File::getSpecialLocation(juce::File::userMusicDirectory));
-
+    juce::FileChooser fileChooser("Choose a mixdown folder");
     //Awaits user directory selection
     if (fileChooser.browseForDirectory()) {
         juce::File myDirectory;
