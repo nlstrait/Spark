@@ -16,7 +16,7 @@ Here we have early experiments with JUCE.
 ### `Source/`
 Top-level directory for Spark's source code.
 
-### `mixdowns-example`
+### `mixdowns-example/`
 An example folder holding mixdowns. For use in quickly testing Spark.
 
 ### `Spark.jucer`
