@@ -152,7 +152,7 @@ public:
      Create a new LayerRecorderComponent
      @param adm     The audio device manager which this LayerRecorderComponent will use to recieve audio input and send audio output from selected audio devices.
      */
-    LayerRecorderComponent(juce::AudioDeviceManager& adm);
+    LayerRecorderComponent(juce::AudioDeviceManager&);
     ~LayerRecorderComponent() override;
     
     void paint(juce::Graphics& g) override;
@@ -163,6 +163,12 @@ public:
      @param p   A pointer to a Project.
      */
     void setProject(Project* p);
+    
+    /**
+     Sets the transport source to reference so that the start time of a layer recording relative to it's project's mixdown can be saved.
+     This is admittedly bad practice, and indicative of architectural flaws.
+     */
+    void setTransport(juce::AudioTransportSource*);
     
 private:
     juce::AudioDeviceManager& audioDeviceManager;
@@ -175,9 +181,14 @@ private:
     juce::TextButton recordButton { "Record" };
     
     Project* currProject; // The Project which this LayerRecorderComponent is currently recording layers to
+    juce::AudioTransportSource* transport;
+    double posOfLastRecordStart; // time position (relative to project's mixdown) that the last recording was started
+    juce::AudioFormatManager audioFormatManager;
+    juce::WavAudioFormat wavAudioFormat;
     
     void startRecording();
     void stopRecording();
+    void padRecording();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerRecorderComponent)
 };

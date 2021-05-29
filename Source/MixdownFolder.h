@@ -66,6 +66,8 @@ public:
     * Called everytime the MixDownFolder component size is changed.
     */
     void resized() override;
+                                
+    juce::AudioTransportSource* getTransportPtr() { return &(this->transport); }
 
 //Variables and enumerations of Mixdown Folder class
 private:

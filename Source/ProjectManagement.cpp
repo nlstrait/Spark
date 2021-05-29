@@ -60,6 +60,10 @@ juce::File Project::createNewLayer() {
     return layerFile;
 }
 
+juce::File Project::getLastLayerFile() {
+    return layers.getReference(layers.size() - 1).getFile();
+}
+
 int Project::getNumLayers() { return layers.size(); }
 
 

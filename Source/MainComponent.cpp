@@ -16,6 +16,8 @@ MainComponent::MainComponent()
     {
         
     addAndMakeVisible(layerRecorderComp);
+    // This is certainly bad practice, but alternatives require radical redesign
+    layerRecorderComp.setTransport(mixdownFolderComp.getTransportPtr());
         
     addAndMakeVisible(audioSetupComp);
         
@@ -34,7 +36,6 @@ MainComponent::MainComponent()
     
     setAudioChannels(2, 2); // This could be more sophisticated to handle unconvential input/output setups
     deviceManager.addChangeListener(this);
-    
 }
 
 /**

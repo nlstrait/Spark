@@ -16,6 +16,7 @@
 class Layer {
 public:
     Layer(juce::File file);
+    
     bool operator==(const Layer& other);
     
     juce::File& getFile();
@@ -58,6 +59,8 @@ public:
      Creates and returns a new layer for this Project.
      */
     juce::File createNewLayer();
+    
+    juce::File getLastLayerFile();
     
     /**
      Return the number of Layers within this Project.

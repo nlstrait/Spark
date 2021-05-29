@@ -192,7 +192,7 @@ inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::
 
 //===================================== LayerRecorderComponent =========================================
 
-LayerRecorderComponent::LayerRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm), currProject(nullptr) {
+LayerRecorderComponent::LayerRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm), currProject(nullptr), transport(nullptr) {
     setOpaque (true);
     //addAndMakeVisible (liveAudioScroller);
 
@@ -223,6 +223,8 @@ LayerRecorderComponent::LayerRecorderComponent(juce::AudioDeviceManager& adm) : 
 
     audioDeviceManager.addAudioCallback (&liveAudioScroller);
     audioDeviceManager.addAudioCallback (&recorder);
+    
+    audioFormatManager.registerBasicFormats();
 
     setSize (500, 500);
 }
@@ -251,6 +253,10 @@ void LayerRecorderComponent::setProject(Project *p) {
     explanationLabel.setText("Press to record a new layer for project " + p->getName(), juce::sendNotification);
 }
 
+void LayerRecorderComponent::setTransport(juce::AudioTransportSource* ats) {
+    this->transport = ats;
+}
+
 void LayerRecorderComponent::startRecording() {
     if (! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::writeExternalStorage)) {
         SafePointer<LayerRecorderComponent> safeThis (this);
@@ -264,6 +270,7 @@ void LayerRecorderComponent::startRecording() {
 
     Layer newLayer = currProject->createNewLayer();
     recorder.startRecording (newLayer.getFile());
+    posOfLastRecordStart = transport->getCurrentPosition();
 
     recordButton.setButtonText ("Stop");
     recordingThumbnail.setDisplayFullThumbnail (false);
@@ -273,4 +280,47 @@ void LayerRecorderComponent::stopRecording() {
     recorder.stopRecording();
     recordButton.setButtonText ("Record");
     recordingThumbnail.setDisplayFullThumbnail (true);
+    padRecording();
 }
+
+void LayerRecorderComponent::padRecording() {
+    juce::File layerFile = currProject->getLastLayerFile();
+    juce::AudioFormatReader* reader = audioFormatManager.createReaderFor(layerFile);
+    if (reader != nullptr) {
+        // store values
+        int sampleRate = reader->sampleRate;
+        int numChannels = reader->numChannels;
+        int bitsPerSample = reader->bitsPerSample;
+        int originalLengthInSamples = reader->lengthInSamples;
+        juce::StringPairArray metadataValues = reader->metadataValues;
+        
+        // calculate number of samples to add as padding
+        //int paddingNumSamples = posOfLastRecordStart * sampleRate;
+        int paddingNumSamples = 1 * sampleRate;
+        int newNumSamples = paddingNumSamples + originalLengthInSamples;
+        juce::AudioSampleBuffer buffer(numChannels, newNumSamples);
+        
+        // add padding to buffer
+        for (int channel = 0; channel < numChannels; channel++) {
+            float* writePtr = buffer.getWritePointer(channel);
+            for (int i = 0; i < paddingNumSamples; i++) {
+                writePtr[i] = (i % 2 == 0 ? 0.00001 : -0.00001);
+            }
+        }
+        
+        // add actual recording to buffer
+        reader->read(&buffer, paddingNumSamples, originalLengthInSamples, 0, true, true);
+        
+        // write buffer over old layer file
+        juce::FileOutputStream outputStream(layerFile);
+        if (outputStream.openedOk()) {
+            juce::AudioFormatWriter* writer = wavAudioFormat.createWriterFor(&outputStream, sampleRate, numChannels, bitsPerSample, metadataValues, 0);
+            writer->writeFromAudioSampleBuffer(buffer, 0, newNumSamples);
+        } else {
+            throw "unnale to write to file of last layer recorded";
+        }
+    } else {
+        throw "unable to read file of last layer recorded";
+    }
+}
+
