@@ -32,7 +32,7 @@ public:
      Begin recording.
      @param file    File to record to.
      */
-    void startRecording(const juce::File& file);
+    void startRecording(const juce::File& file, double paddingTime=0.0);
     
     /**
      Stop recording.
@@ -65,6 +65,8 @@ public:
                                 int numSamples) override;
     
 private:
+    void padRecording(juce::AudioFormatWriter*, double paddingTime);
+    
     juce::AudioThumbnail& thumbnail; // for drawing scaled view of audio waveform
     juce::TimeSliceThread backgroundThread { "Audio Recorder Thread" }; // this thread writes audio data to disk
     std::unique_ptr<juce::AudioFormatWriter::ThreadedWriter> threadedWriter; // FIFO buffer for incoming data
@@ -182,13 +184,9 @@ private:
     
     Project* currProject; // The Project which this LayerRecorderComponent is currently recording layers to
     juce::AudioTransportSource* transport;
-    double posOfLastRecordStart; // time position (relative to project's mixdown) that the last recording was started
-    juce::AudioFormatManager audioFormatManager;
-    juce::WavAudioFormat wavAudioFormat;
     
     void startRecording();
     void stopRecording();
-    void padRecording();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerRecorderComponent)
 };

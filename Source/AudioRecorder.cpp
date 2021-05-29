@@ -23,13 +23,9 @@ AudioRecorder::~AudioRecorder() {
     stopRecording();
 }
 
-void AudioRecorder::startRecording(const juce::File& file) {
+void AudioRecorder::startRecording(const juce::File& file, double paddingTime) {
     stopRecording();
-    
-    // TODO: add filler to start of file, dependent on starting position of recording (relative to mixdown)
-    
     if (sampleRate <= 0) return;
-    
     file.deleteFile();
     
     // Open filestream to write to destination file
@@ -39,6 +35,8 @@ void AudioRecorder::startRecording(const juce::File& file) {
         
         if (auto writer = wavFormat.createWriterFor(fileStream.get(), sampleRate, 1, 16, {}, 0)) {
             fileStream.release(); // (passes responsibility for deleting the stream to the writer object that is now using it
+            
+            if (paddingTime > 0.0) padRecording(writer, paddingTime);
             
             // Now we'll create one of these helper objects which will act as a FIFO buffer, and will
             // write the data to disk on our background thread.
@@ -53,6 +51,13 @@ void AudioRecorder::startRecording(const juce::File& file) {
             activeWriter = threadedWriter.get();
         }
     } else throw "Unable to open provided file";
+}
+
+void AudioRecorder::padRecording(juce::AudioFormatWriter* writer, double paddingTime) {
+    int numSamples = paddingTime * writer->getSampleRate();
+    juce::AudioBuffer<float> padding(writer->getNumChannels(), numSamples);
+    padding.clear();
+    writer->writeFromAudioSampleBuffer(padding, 0, numSamples);
 }
 
 void AudioRecorder::stopRecording() {
@@ -172,7 +177,6 @@ void LiveScrollingAudioDisplay::audioDeviceIOCallback(const float **inputChannel
         pushSample (&inputSample, 1);
     }
 
-    // TODO: Ensure that buffer clearing does not interfere with other components
     // We need to clear the output buffers before returning, in case they're full of junk..
     for (int j = 0; j < numOutputChannels; ++j)
         if (float* outputChannel = outputChannelData[j])
@@ -223,8 +227,6 @@ LayerRecorderComponent::LayerRecorderComponent(juce::AudioDeviceManager& adm) : 
 
     audioDeviceManager.addAudioCallback (&liveAudioScroller);
     audioDeviceManager.addAudioCallback (&recorder);
-    
-    audioFormatManager.registerBasicFormats();
 
     setSize (500, 500);
 }
@@ -269,8 +271,7 @@ void LayerRecorderComponent::startRecording() {
     }
 
     Layer newLayer = currProject->createNewLayer();
-    recorder.startRecording (newLayer.getFile());
-    posOfLastRecordStart = transport->getCurrentPosition();
+    recorder.startRecording (newLayer.getFile(), transport->getCurrentPosition());
 
     recordButton.setButtonText ("Stop");
     recordingThumbnail.setDisplayFullThumbnail (false);
@@ -280,47 +281,4 @@ void LayerRecorderComponent::stopRecording() {
     recorder.stopRecording();
     recordButton.setButtonText ("Record");
     recordingThumbnail.setDisplayFullThumbnail (true);
-    padRecording();
 }
-
-void LayerRecorderComponent::padRecording() {
-    juce::File layerFile = currProject->getLastLayerFile();
-    juce::AudioFormatReader* reader = audioFormatManager.createReaderFor(layerFile);
-    if (reader != nullptr) {
-        // store values
-        int sampleRate = reader->sampleRate;
-        int numChannels = reader->numChannels;
-        int bitsPerSample = reader->bitsPerSample;
-        int originalLengthInSamples = reader->lengthInSamples;
-        juce::StringPairArray metadataValues = reader->metadataValues;
-        
-        // calculate number of samples to add as padding
-        //int paddingNumSamples = posOfLastRecordStart * sampleRate;
-        int paddingNumSamples = 1 * sampleRate;
-        int newNumSamples = paddingNumSamples + originalLengthInSamples;
-        juce::AudioSampleBuffer buffer(numChannels, newNumSamples);
-        
-        // add padding to buffer
-        for (int channel = 0; channel < numChannels; channel++) {
-            float* writePtr = buffer.getWritePointer(channel);
-            for (int i = 0; i < paddingNumSamples; i++) {
-                writePtr[i] = (i % 2 == 0 ? 0.00001 : -0.00001);
-            }
-        }
-        
-        // add actual recording to buffer
-        reader->read(&buffer, paddingNumSamples, originalLengthInSamples, 0, true, true);
-        
-        // write buffer over old layer file
-        juce::FileOutputStream outputStream(layerFile);
-        if (outputStream.openedOk()) {
-            juce::AudioFormatWriter* writer = wavAudioFormat.createWriterFor(&outputStream, sampleRate, numChannels, bitsPerSample, metadataValues, 0);
-            writer->writeFromAudioSampleBuffer(buffer, 0, newNumSamples);
-        } else {
-            throw "unnale to write to file of last layer recorded";
-        }
-    } else {
-        throw "unable to read file of last layer recorded";
-    }
-}
-
