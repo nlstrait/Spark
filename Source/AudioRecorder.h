@@ -172,6 +172,8 @@ public:
      */
     void setTransport(juce::AudioTransportSource*);
     
+    void stopRecording();
+    
 private:
     juce::AudioDeviceManager& audioDeviceManager;
     
@@ -186,7 +188,6 @@ private:
     juce::AudioTransportSource* transport;
     
     void startRecording();
-    void stopRecording();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerRecorderComponent)
 };

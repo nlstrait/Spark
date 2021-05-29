@@ -52,7 +52,10 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm, LayerRecorde
     stopButton.setButtonText("Stop");
     stopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
     //Lambda captures event on button click and calls function
-    stopButton.onClick = [this] {stopButtonClickResponse(); };
+    stopButton.onClick = [this] {
+        stopButtonClickResponse();
+        this->layerRecorder.stopRecording();
+    };
     stopButton.setEnabled(false);
 
     //Registers the basic format of WAV and RIFF files
