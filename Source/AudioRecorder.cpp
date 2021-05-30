@@ -11,6 +11,7 @@
 */
 
 #include "AudioRecorder.h"
+#include "MixdownFolder.h"
 
 
 //===================================== AudioRecorder =========================================
@@ -258,6 +259,9 @@ void LayerRecorderComponent::setProject(Project *p) {
 void LayerRecorderComponent::setTransport(juce::AudioTransportSource* ats) {
     this->transport = ats;
 }
+void LayerRecorderComponent::setPlaybackComp(MixdownFolderComp* playbackComp) {
+    this->playbackComp = playbackComp;
+}
 
 void LayerRecorderComponent::startRecording() {
     if (! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::writeExternalStorage)) {
@@ -272,6 +276,8 @@ void LayerRecorderComponent::startRecording() {
 
     Layer newLayer = currProject->createNewLayer();
     recorder.startRecording (newLayer.getFile(), transport->getCurrentPosition());
+    isCurrentlyRecording = true;
+    playbackComp->triggerPlayback();
 
     recordButton.setButtonText ("Stop");
     recordingThumbnail.setDisplayFullThumbnail (false);
@@ -279,6 +285,7 @@ void LayerRecorderComponent::startRecording() {
 
 void LayerRecorderComponent::stopRecording() {
     recorder.stopRecording();
+    isCurrentlyRecording = false;
     recordButton.setButtonText ("Record");
     recordingThumbnail.setDisplayFullThumbnail (true);
 }

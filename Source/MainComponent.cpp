@@ -18,7 +18,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(layerRecorderComp);
     // This is certainly bad practice, but alternatives require radical redesign
     layerRecorderComp.setTransport(mixdownFolderComp.getTransportPtr());
-        
+    layerRecorderComp.setPlaybackComp(&mixdownFolderComp);
     addAndMakeVisible(audioSetupComp);
         
     addAndMakeVisible(mixdownFolderComp);

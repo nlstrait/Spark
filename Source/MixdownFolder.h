@@ -68,6 +68,8 @@ public:
     void resized() override;
                                 
     juce::AudioTransportSource* getTransportPtr() { return &(this->transport); }
+                                
+    void triggerPlayback();
 
 //Variables and enumerations of Mixdown Folder class
 private:

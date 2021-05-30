@@ -14,6 +14,7 @@
 
 #include <JuceHeader.h>
 #include "ProjectManagement.h"
+class MixdownFolderComp;
 
 
 /** A simple class that acts as an AudioIODeviceCallback and writes the
@@ -171,8 +172,12 @@ public:
      This is admittedly bad practice, and indicative of architectural flaws.
      */
     void setTransport(juce::AudioTransportSource*);
+    void setPlaybackComp(MixdownFolderComp*);
     
+    void startRecording();
     void stopRecording();
+    
+    bool isRecording() { return isCurrentlyRecording; }
     
 private:
     juce::AudioDeviceManager& audioDeviceManager;
@@ -184,10 +189,11 @@ private:
     juce::Label explanationLabel { {}, "No project loaded"};
     juce::TextButton recordButton { "Record" };
     
+    bool isCurrentlyRecording;
+    
+    MixdownFolderComp* playbackComp;
     Project* currProject; // The Project which this LayerRecorderComponent is currently recording layers to
     juce::AudioTransportSource* transport;
-    
-    void startRecording();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerRecorderComponent)
 };

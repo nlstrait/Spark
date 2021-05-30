@@ -166,6 +166,11 @@ void MixdownFolderComp::stateChange(TransportState newState) {
     }
 }
 
+void MixdownFolderComp::triggerPlayback() {
+    if (state != Playing)
+        playButton.triggerClick();
+}
+
 /**
 * Function updates dropdown bar with selected audio file and primes playback.
 * Component state is reverted to state.Stopped if it has been changed.
@@ -177,6 +182,11 @@ void MixdownFolderComp::fileBoxMenuChanged() {
     //fileBoxMenu indices starts at 1 but array indices start at 0
     Project& selected = projects.getReference(fileID-1);
     layerRecorder.setProject(&selected);
+    if (layerRecorder.isRecording()) {
+        // continue recording, but for new project
+        layerRecorder.stopRecording();
+        layerRecorder.startRecording();
+    }
     
     juce::AudioFormatReader* fileReader = audioFormatManager.createReaderFor(selected.getMixdownFile());
 
@@ -189,10 +199,6 @@ void MixdownFolderComp::fileBoxMenuChanged() {
         playButton.setEnabled(true);
 
         reader.reset(tempReader.release());
-    }
-
-    if (state != Stopped) {
-        stateChange(Stopped);
     }
 
     //Set bounds of next/prev buttons
@@ -284,9 +290,10 @@ void MixdownFolderComp::prevButtonClickResponse() {
         prevButton.setEnabled(true);
     }
     
-    // Continue playing (begin playing new track seemlessly)
-    if (lastState == Playing)
+    if (lastState == Playing) {
+        // Continue playing (begin playing new track seemlessly)
         playButton.triggerClick();
+    }
 }
 
 /**
