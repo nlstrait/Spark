@@ -96,7 +96,8 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
         return;
     }
     transport.getNextAudioBlock(bufferToFill);
-    //audioPositionSlider.setValue(transport.getCurrentPosition());
+    audioPositionSlider.setNumDecimalPlacesToDisplay(3);
+    audioPositionSlider.setValue(round(transport.getCurrentPosition() * 10000.0)/10000.0);
 }
 
 /**
@@ -132,6 +133,7 @@ void MixdownFolderComp::stateChange(TransportState newState) {
                 stopButton.setButtonText("Stop");
                 stopButton.setEnabled(false);
                 transport.setPosition(0.0);
+                audioPositionSlider.setValue(0);
                 break;
 
             case Starting:
@@ -184,9 +186,9 @@ void MixdownFolderComp::fileBoxMenuChanged() {
             tempReader(new juce::AudioFormatReaderSource(fileReader, true));
 
         //fileReader->sampleRate handles hardware file sample rate match up
+        transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
         audioPositionSlider.setValue(0);
         audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
-        transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
 
         playButton.setEnabled(true);
 
