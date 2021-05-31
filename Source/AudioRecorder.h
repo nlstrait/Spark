@@ -13,6 +13,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ProjectManagement.h"
+class MixdownFolderComp;
 
 
 /** A simple class that acts as an AudioIODeviceCallback and writes the
@@ -31,7 +33,7 @@ public:
      Begin recording.
      @param file    File to record to.
      */
-    void startRecording(const juce::File& file);
+    void startRecording(const juce::File& file, double paddingTime=0.0);
     
     /**
      Stop recording.
@@ -64,6 +66,8 @@ public:
                                 int numSamples) override;
     
 private:
+    void padRecording(juce::AudioFormatWriter*, double paddingTime);
+    
     juce::AudioThumbnail& thumbnail; // for drawing scaled view of audio waveform
     juce::TimeSliceThread backgroundThread { "Audio Recorder Thread" }; // this thread writes audio data to disk
     std::unique_ptr<juce::AudioFormatWriter::ThreadedWriter> threadedWriter; // FIFO buffer for incoming data
@@ -143,19 +147,37 @@ public:
 
 
 /**
- The top-level component which houses the other components necessary for recording audio.
+ The top-level component which houses the other components necessary for recording layers.
  */
-class AudioRecorderComponent : public juce::Component {
+class LayerRecorderComponent : public juce::Component {
 public:
     /**
-     Create a new AudioRecorderComponent
-     @param adm     The audio device manager which this AudioRecorderComponent will use to recieve audio input and send audio output from selected audio devices.
+     Create a new LayerRecorderComponent
+     @param adm     The audio device manager which this LayerRecorderComponent will use to recieve audio input and send audio output from selected audio devices.
      */
-    AudioRecorderComponent(juce::AudioDeviceManager& adm);
-    ~AudioRecorderComponent() override;
+    LayerRecorderComponent(juce::AudioDeviceManager&);
+    ~LayerRecorderComponent() override;
     
     void paint(juce::Graphics& g) override;
     void resized() override;
+    
+    /**
+     Sets a Project for this LayerRecorderComponent to focus on and record layers to.
+     @param p   A pointer to a Project.
+     */
+    void setProject(Project* p);
+    
+    /**
+     Sets the transport source to reference so that the start time of a layer recording relative to it's project's mixdown can be saved.
+     This is admittedly bad practice, and indicative of architectural flaws.
+     */
+    void setTransport(juce::AudioTransportSource*);
+    void setPlaybackComp(MixdownFolderComp*);
+    
+    void startRecording();
+    void stopRecording();
+    
+    bool isRecording() { return isCurrentlyRecording; }
     
 private:
     juce::AudioDeviceManager& audioDeviceManager;
@@ -164,15 +186,16 @@ private:
     RecordingThumbnail recordingThumbnail;
     AudioRecorder recorder { recordingThumbnail.getAudioThumbnail() };
     
-    juce::Label explanationLabel { {}, "Record a wave file from the live audio input.\n\nPressing record will start recording a file in your \"Documents\" folder."};
+    juce::Label explanationLabel { {}, "No project loaded"};
     juce::TextButton recordButton { "Record" };
-    juce::File lastRecording;
     
-    void startRecording();
+    bool isCurrentlyRecording;
     
-    void stopRecording();
+    MixdownFolderComp* playbackComp;
+    Project* currProject; // The Project which this LayerRecorderComponent is currently recording layers to
+    juce::AudioTransportSource* transport;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioRecorderComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerRecorderComponent)
 };
 
 

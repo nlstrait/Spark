@@ -11,6 +11,7 @@
 */
 
 #include "AudioRecorder.h"
+#include "MixdownFolder.h"
 
 
 //===================================== AudioRecorder =========================================
@@ -23,14 +24,10 @@ AudioRecorder::~AudioRecorder() {
     stopRecording();
 }
 
-void AudioRecorder::startRecording(const juce::File& file) {
+void AudioRecorder::startRecording(const juce::File& file, double paddingTime) {
     stopRecording();
-    
-    // TODO: add filler to start of file, dependent on starting position of recording (relative to mixdown)
-    
     if (sampleRate <= 0) return;
-    
-    // file.deleteFile(); // potentially dangerous and unnecessary
+    file.deleteFile();
     
     // Open filestream to write to destination file
     if (auto fileStream = std::unique_ptr<juce::FileOutputStream>(file.createOutputStream())) {
@@ -39,6 +36,8 @@ void AudioRecorder::startRecording(const juce::File& file) {
         
         if (auto writer = wavFormat.createWriterFor(fileStream.get(), sampleRate, 1, 16, {}, 0)) {
             fileStream.release(); // (passes responsibility for deleting the stream to the writer object that is now using it
+            
+            if (paddingTime > 0.0) padRecording(writer, paddingTime);
             
             // Now we'll create one of these helper objects which will act as a FIFO buffer, and will
             // write the data to disk on our background thread.
@@ -52,7 +51,14 @@ void AudioRecorder::startRecording(const juce::File& file) {
             const juce::ScopedLock sl (writerLock);
             activeWriter = threadedWriter.get();
         }
-    }
+    } else throw "Unable to open provided file";
+}
+
+void AudioRecorder::padRecording(juce::AudioFormatWriter* writer, double paddingTime) {
+    int numSamples = paddingTime * writer->getSampleRate();
+    juce::AudioBuffer<float> padding(writer->getNumChannels(), numSamples);
+    padding.clear();
+    writer->writeFromAudioSampleBuffer(padding, 0, numSamples);
 }
 
 void AudioRecorder::stopRecording() {
@@ -84,7 +90,7 @@ void AudioRecorder::audioDeviceIOCallback (const float** inputChannelData, int n
                             float** outputChannelData, int numOutputChannels,
                             int numSamples) {
     
-    const juce::ScopedLock sl(AudioRecorder::writerLock); // why is "AudioRecorder::" necessary here?
+    const juce::ScopedLock sl(AudioRecorder::writerLock);
 
     if (activeWriter.load() != nullptr && numInputChannels >= thumbnail.getNumChannels()) // This seems funky; why would we compare numInput channels with the thumbnail channels? I thought the thumbnail was just used for painting waveforms @Nolan
     {
@@ -172,7 +178,6 @@ void LiveScrollingAudioDisplay::audioDeviceIOCallback(const float **inputChannel
         pushSample (&inputSample, 1);
     }
 
-    // TODO: Ensure that buffer clearing does not interfere with other components
     // We need to clear the output buffers before returning, in case they're full of junk..
     for (int j = 0; j < numOutputChannels; ++j)
         if (float* outputChannel = outputChannelData[j])
@@ -190,9 +195,9 @@ inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::
 }
 
 
-//===================================== AudioRecorderComponent =========================================
+//===================================== LayerRecorderComponent =========================================
 
-AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm) {
+LayerRecorderComponent::LayerRecorderComponent(juce::AudioDeviceManager& adm) : audioDeviceManager(adm), currProject(nullptr), transport(nullptr) {
     setOpaque (true);
     //addAndMakeVisible (liveAudioScroller);
 
@@ -211,6 +216,7 @@ AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : 
         if (recorder.isRecording()) stopRecording();
         else startRecording();
     };
+    recordButton.setEnabled(false); // disabled until a project is loaded
 
     addAndMakeVisible (recordingThumbnail);
 
@@ -226,16 +232,16 @@ AudioRecorderComponent::AudioRecorderComponent(juce::AudioDeviceManager& adm) : 
     setSize (500, 500);
 }
 
-AudioRecorderComponent::~AudioRecorderComponent() {
+LayerRecorderComponent::~LayerRecorderComponent() {
     audioDeviceManager.removeAudioCallback (&recorder);
     audioDeviceManager.removeAudioCallback (&liveAudioScroller);
 }
 
-void AudioRecorderComponent::paint(juce::Graphics &g) {
+void LayerRecorderComponent::paint(juce::Graphics &g) {
     g.fillAll(getUIColourIfAvailable(juce::LookAndFeel_V4::ColourScheme::UIColour::windowBackground));
 }
 
-void AudioRecorderComponent::resized() {
+void LayerRecorderComponent::resized() {
     auto area = getLocalBounds();
 
     //liveAudioScroller .setBounds (area.removeFromTop (80).reduced (8));
@@ -244,9 +250,22 @@ void AudioRecorderComponent::resized() {
     explanationLabel  .setBounds (area.reduced (8));
 }
 
-void AudioRecorderComponent::startRecording() {
+void LayerRecorderComponent::setProject(Project *p) {
+    this->currProject = p;
+    recordButton.setEnabled(true);
+    explanationLabel.setText("Press to record a new layer for project " + p->getName(), juce::sendNotification);
+}
+
+void LayerRecorderComponent::setTransport(juce::AudioTransportSource* ats) {
+    this->transport = ats;
+}
+void LayerRecorderComponent::setPlaybackComp(MixdownFolderComp* playbackComp) {
+    this->playbackComp = playbackComp;
+}
+
+void LayerRecorderComponent::startRecording() {
     if (! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::writeExternalStorage)) {
-        SafePointer<AudioRecorderComponent> safeThis (this);
+        SafePointer<LayerRecorderComponent> safeThis (this);
 
         juce::RuntimePermissions::request (juce::RuntimePermissions::writeExternalStorage,
                                      [safeThis] (bool granted) mutable {
@@ -255,44 +274,18 @@ void AudioRecorderComponent::startRecording() {
         return;
     }
 
-   #if (JUCE_ANDROID || JUCE_IOS)
-    auto parentDir = juce::File::getSpecialLocation (juce::File::tempDirectory);
-   #else
-    auto parentDir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory);
-   #endif
-
-    lastRecording = parentDir.getNonexistentChildFile ("JUCE Demo Audio Recording", ".wav");
-
-    recorder.startRecording (lastRecording);
+    Layer newLayer = currProject->createNewLayer();
+    recorder.startRecording (newLayer.getFile(), transport->getCurrentPosition());
+    isCurrentlyRecording = true;
+    playbackComp->triggerPlayback();
 
     recordButton.setButtonText ("Stop");
     recordingThumbnail.setDisplayFullThumbnail (false);
 }
 
-void AudioRecorderComponent::stopRecording() {
+void LayerRecorderComponent::stopRecording() {
     recorder.stopRecording();
-
-    // TODO: Confirm value of this #if
-   #if JUCE_CONTENT_SHARING
-    SafePointer<AudioRecordingDemo> safeThis (this);
-    File fileToShare = lastRecording;
-
-    ContentSharer::getInstance()->shareFiles (Array<URL> ({URL (fileToShare)}),
-                                              [safeThis, fileToShare] (bool success, const String& error)
-                                              {
-                                                  if (fileToShare.existsAsFile())
-                                                      fileToShare.deleteFile();
-
-                                                  if (! success && error.isNotEmpty())
-                                                  {
-                                                      NativeMessageBox::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                                                                             "Sharing Error",
-                                                                                             error);
-                                                  }
-                                              });
-   #endif
-
-    lastRecording = juce::File();
+    isCurrentlyRecording = false;
     recordButton.setButtonText ("Record");
     recordingThumbnail.setDisplayFullThumbnail (true);
 }
