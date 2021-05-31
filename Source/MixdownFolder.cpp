@@ -12,6 +12,7 @@
   ==============================================================================
 */
 
+#include <JuceHeader.h>
 #include "MixdownFolder.h"
 
 /**
@@ -19,6 +20,17 @@
 * @see MixdownFolder.h
 */
 MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceManager(adm), state(Stopped) {
+    addAndMakeVisible(zoomSlider);
+    zoomSlider.setRange(0, 1, 0);
+    zoomSlider.onValueChange = [this] { tn->setZoomFactor(zoomSlider.getValue()); };
+    zoomSlider.setSkewFactor(2);
+
+    tn.reset(new ThumbnailComp(audioFormatManager, transport, zoomSlider));
+    std::cout << tn->getName() << std::endl;
+    addAndMakeVisible(tn.get());
+    tn->addChangeListener(this);
+
+    thread.startThread(3);
 
     addAndMakeVisible(&fileBoxMenu);
     fileBoxMenu.setJustificationType(juce::Justification::centred);
@@ -77,7 +89,19 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
 * Destructor
 * @see MixdownFolder.h
 */
-MixdownFolderComp::~MixdownFolderComp() {}
+MixdownFolderComp::~MixdownFolderComp() 
+{
+    transport.setSource(nullptr);
+    tn->removeChangeListener(this);
+}
+
+/*
+  ==============================================================================
+
+    AUDIO METHODS
+
+  ==============================================================================
+*/
 
 /**
 * @see MixdownFolder.h
@@ -96,8 +120,8 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
         return;
     }
     transport.getNextAudioBlock(bufferToFill);
-    audioPositionSlider.setNumDecimalPlacesToDisplay(3);
-    audioPositionSlider.setValue(round(transport.getCurrentPosition() * 10000.0)/10000.0);
+    //audioPositionSlider.setNumDecimalPlacesToDisplay(3);
+    //audioPositionSlider.setValue(round(transport.getCurrentPosition() * 10000.0)/10000.0);
 }
 
 /**
@@ -105,10 +129,21 @@ void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bu
 */
 void MixdownFolderComp::releaseResources() { transport.releaseResources(); }
 
+/*
+  ==============================================================================
+
+    CHANGE LISTENER CALLBACK METHODS
+  ==============================================================================
+*/
+
 /**
 * @see MixdownFolder.h
 */
-void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) {
+void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster* source) {
+    if (source == tn.get()) {
+        showAudioResource(URL(tn->getLastDroppedFile()));
+    }
+
     if (source == &transport) {
         if (transport.isPlaying()) {
             stateChange(Playing);
@@ -187,8 +222,13 @@ void MixdownFolderComp::fileBoxMenuChanged() {
 
         //fileReader->sampleRate handles hardware file sample rate match up
         transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
-        audioPositionSlider.setValue(0);
-        audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
+
+        //audioPositionSlider.setValue(0);
+        //audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
+
+        juce::URL* url = new juce::URL(selectedAudioFile);
+        juce::URL& url2 = *url;
+        tn->setURL(url2);
 
         playButton.setEnabled(true);
 
@@ -211,6 +251,14 @@ void MixdownFolderComp::fileBoxMenuChanged() {
         prevButton.setEnabled(true);
     }
 }
+
+/*
+  ==============================================================================
+
+    BUTTON CLICK RESPONSES
+
+  ==============================================================================
+*/
 
 /**
 * @see MixdownFolder.h
@@ -303,6 +351,14 @@ void MixdownFolderComp::stopButtonClickResponse() {
     }
 }
 
+/*
+  ==============================================================================
+
+    REDRAW METHODS
+
+  ==============================================================================
+*/
+
 /**
 * @see MixdownFolder.h
 */
@@ -319,28 +375,47 @@ void MixdownFolderComp::resized() {
     auto area = getLocalBounds();
     
     //Scaled to the parent window view
-    fileButton.setBounds(area.removeFromTop(41).reduced(8));
-    fileBoxMenu.setBounds(area.removeFromTop(41).reduced(8));
+    fileButton.setBounds(area.removeFromTop(31).reduced(8));
+    fileBoxMenu.setBounds(area.removeFromTop(31).reduced(8));
     
-    juce::Grid prevNextGrid;
-    using Track = juce::Grid::TrackInfo;
-    using Fr = juce::Grid::Fr;
+    //juce::Grid prevNextGrid;
+    //using Track = juce::Grid::TrackInfo;
+    //using Fr = juce::Grid::Fr;
     
-    audioPositionSlider.setBounds(area.removeFromTop(41).reduced(8));
 
-    prevNextGrid.templateRows = { Track (Fr (1)), Track (Fr (1)) };
-    prevNextGrid.templateColumns = { Track (Fr (1)), Track (Fr (1)) };
+    auto r = getLocalBounds().reduced(4);
+    auto controls = r.removeFromBottom(90);
+    auto zoom = controls.removeFromTop(25);
+    zoomSlider.setBounds(zoom);
+    r.removeFromBottom(6);
+    tn->setBounds(r.removeFromBottom(140));
+
+
+    //audioPositionSlider.setBounds(area.removeFromTop(41).reduced(8));
+
+    //prevNextGrid.templateRows = { Track (Fr (1)), Track (Fr (1)) };
+    //prevNextGrid.templateColumns = { Track (Fr (1)), Track (Fr (1)) };
     
-    prevNextGrid.items = {
-        juce::GridItem(prevButton), juce::GridItem(nextButton),
-        juce::GridItem(stopButton), juce::GridItem(playButton)
-    };
+    //prevNextGrid.items = {
+        //juce::GridItem(prevButton), juce::GridItem(nextButton),
+        //juce::GridItem(stopButton), juce::GridItem(playButton)
+    //};
     
-    prevNextGrid.setGap(juce::Grid::Px(12));
+    //prevNextGrid.setGap(juce::Grid::Px(12));
     
-    prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
+    //prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
     
 }
+
+
+/*
+  ==============================================================================
+
+    HELPER METHODS
+
+  ==============================================================================
+*/
+
 
 /*
 * Function rounds a given number in the form val = (val * 10^decimals)

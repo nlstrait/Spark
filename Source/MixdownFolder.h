@@ -12,11 +12,19 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ThumbnailComp.h"
+#include "DemoUtilities.h"
 
 class MixdownFolderComp :   public juce::Component,
                             public juce::AudioSource,
-                            public juce::ChangeListener,
-                            public juce::Slider::Listener {
+                            public juce::Slider::Listener,
+#if (JUCE_ANDROID || JUCE_IOS)
+    private Button::Listener,
+#else
+    private juce::FileBrowserListener,
+#endif
+    private juce::ChangeListener
+{
 
 /*
   ==============================================================================
@@ -89,6 +97,11 @@ public:
  */
 
 private:
+    std::unique_ptr<ThumbnailComp> tn;
+    juce::Slider zoomSlider{ Slider::LinearHorizontal, Slider::NoTextBox };
+    URL currentAudioFileURL;
+    TimeSliceThread thread{ "audio file preview" };
+
     //Device manager for user output/input
     juce::AudioDeviceManager& deviceManager;
 
@@ -161,6 +174,75 @@ private:
     //Stop current selected file playback and event response
     juce::TextButton stopButton;
     void stopButtonClickResponse();
+
+
+
+    void showAudioResource(URL resource)
+    {
+        if (loadURLIntoTransport(resource))
+            currentAudioFileURL = std::move(resource);
+
+        zoomSlider.setValue(0, dontSendNotification);
+        tn->setURL(currentAudioFileURL);
+    }
+
+    bool loadURLIntoTransport(const URL& audioURL)
+    {
+        transport.stop();
+        transport.setSource(nullptr);
+        reader.reset();
+
+        AudioFormatReader* reader2 = nullptr;
+
+    #if ! JUCE_IOS
+        if (audioURL.isLocalFile())
+        {
+            reader2 = audioFormatManager.createReaderFor(audioURL.getLocalFile());
+        }
+        else
+    #endif
+        {
+            if (reader2 == nullptr)
+                reader2 = audioFormatManager.createReaderFor(audioURL.createInputStream(false));
+        }
+
+        if (reader2 != nullptr)
+        {
+            reader.reset(new AudioFormatReaderSource(reader2, true));
+
+            transport.setSource(reader.get(),
+                32768,                   
+                &thread,              
+                reader2->sampleRate);     
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void startOrStop()
+    {
+        if (transport.isPlaying())
+        {
+            transport.stop();
+        }
+        else
+        {
+            transport.setPosition(0);
+            transport.start();
+        }
+    }
+
+    void selectionChanged() override {
+        showAudioResource(URL(tn->getLastDroppedFile()));
+    }
+
+    void fileClicked(const File&, const MouseEvent&) override {}
+
+    void fileDoubleClicked(const File&) override {}
+
+    void browserRootChanged(const File&) override {}
 
     //Setup Macro to keep a certain coding style standard necessary for JUCE
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixdownFolderComp)
