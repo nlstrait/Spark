@@ -29,7 +29,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(mixdownFolderComp);
     //mixdownFolderComp.addMouseListener(this, true); // not sure if necessary...
         
-    setSize (1000, 400);
+    setSize (1000, 500);
             
     //addAndMakeVisible(diagnosticsBox);
     diagnosticsBox.setMultiLine (true);
@@ -81,7 +81,7 @@ void MainComponent::resized() {
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
     
-    grid.templateRows    = { Track (Fr (1)), Track (Fr (1)) };
+    grid.templateRows    = { Track (Fr (1)), Track (Fr (2)) };
     grid.templateColumns = { Track (Fr (4)), Track (Fr (3)) };
     
     grid.items = {

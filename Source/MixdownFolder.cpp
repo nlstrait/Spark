@@ -242,7 +242,7 @@ void MixdownFolderComp::fileBoxMenuChanged() {
         //audioPositionSlider.setValue(0);
         //audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
 
-        juce::URL* url = new juce::URL(selectedAudioFile);
+        juce::URL* url = new juce::URL(selected.getMixdownFile());
         juce::URL& url2 = *url;
         tn->setURL(url2);
 
@@ -397,36 +397,32 @@ void MixdownFolderComp::resized() {
     
     auto area = getLocalBounds();
     
-    //Scaled to the parent window view
-    fileButton.setBounds(area.removeFromTop(31).reduced(8));
-    fileBoxMenu.setBounds(area.removeFromTop(31).reduced(8));
-    
-    //juce::Grid prevNextGrid;
-    //using Track = juce::Grid::TrackInfo;
-    //using Fr = juce::Grid::Fr;
-    
-
-    auto r = getLocalBounds().reduced(4);
-    auto controls = r.removeFromBottom(90);
-    auto zoom = controls.removeFromTop(25);
+    // playback thumbnail and slider
+    auto r = area.removeFromTop(165);
+    tn->setBounds(r.removeFromTop(140));
+    auto zoom = r.removeFromTop(25);
     zoomSlider.setBounds(zoom);
-    r.removeFromBottom(6);
-    tn->setBounds(r.removeFromBottom(140));
-
-
-    //audioPositionSlider.setBounds(area.removeFromTop(41).reduced(8));
-
-    //prevNextGrid.templateRows = { Track (Fr (1)), Track (Fr (1)) };
-    //prevNextGrid.templateColumns = { Track (Fr (1)), Track (Fr (1)) };
     
-    //prevNextGrid.items = {
-        //juce::GridItem(prevButton), juce::GridItem(nextButton),
-        //juce::GridItem(stopButton), juce::GridItem(playButton)
-    //};
+    //Scaled to the parent window view
+    fileButton.setBounds(area.removeFromTop(41).reduced(8));
+    fileBoxMenu.setBounds(area.removeFromTop(41).reduced(8));
     
-    //prevNextGrid.setGap(juce::Grid::Px(12));
+    // transport buttons
+    juce::Grid prevNextGrid;
+    using Track = juce::Grid::TrackInfo;
+    using Fr = juce::Grid::Fr;
+
+    prevNextGrid.templateRows = { Track (Fr (1)), Track (Fr (1)) };
+    prevNextGrid.templateColumns = { Track (Fr (1)), Track (Fr (1)) };
     
-    //prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
+    prevNextGrid.items = {
+        juce::GridItem(prevButton), juce::GridItem(nextButton),
+        juce::GridItem(stopButton), juce::GridItem(playButton)
+    };
+    
+    prevNextGrid.setGap(juce::Grid::Px(12));
+    
+    prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
     
 }
 
