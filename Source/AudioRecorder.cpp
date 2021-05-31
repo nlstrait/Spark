@@ -187,12 +187,12 @@ void LiveScrollingAudioDisplay::audioDeviceIOCallback(const float **inputChannel
 
 //===================================== Utilities =========================================
 
-inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::UIColour uiColour, juce::Colour fallback = juce::Colour (0xff4d4d4d)) noexcept {
-    if (auto* v4 = dynamic_cast<juce::LookAndFeel_V4*> (&juce::LookAndFeel::getDefaultLookAndFeel()))
-        return v4->getCurrentColourScheme().getUIColour (uiColour);
-
-    return fallback;
-}
+//inline juce::Colour getUIColourIfAvailable (juce::LookAndFeel_V4::ColourScheme::UIColour uiColour, juce::Colour fallback = juce::Colour (0xff4d4d4d)) noexcept {
+//    if (auto* v4 = dynamic_cast<juce::LookAndFeel_V4*> (&juce::LookAndFeel::getDefaultLookAndFeel()))
+//        return v4->getCurrentColourScheme().getUIColour (uiColour);
+//
+//    return fallback;
+//}
 
 
 //===================================== LayerRecorderComponent =========================================

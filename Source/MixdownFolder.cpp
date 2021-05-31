@@ -12,12 +12,26 @@
   ==============================================================================
 */
 
+#include <JuceHeader.h>
 #include "MixdownFolder.h"
 
 /**
-* Acts as constructor to set up necessary variables and functions.
+* Constructor inherits from Audio device manager and state enumeration
+* @see MixdownFolder.h
 */
+
 MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm, LayerRecorderComponent& layerRecorder) : deviceManager(adm), state(Stopped), layerRecorder(layerRecorder) {
+    addAndMakeVisible(zoomSlider);
+    zoomSlider.setRange(0, 1, 0);
+    zoomSlider.onValueChange = [this] { tn->setZoomFactor(zoomSlider.getValue()); };
+    zoomSlider.setSkewFactor(2);
+
+    tn.reset(new ThumbnailComp(audioFormatManager, transport, zoomSlider));
+    std::cout << tn->getName() << std::endl;
+    addAndMakeVisible(tn.get());
+    tn->addChangeListener(this);
+
+    thread.startThread(3);
     
     addAndMakeVisible(&fileBoxMenu);
     fileBoxMenu.setJustificationType(juce::Justification::centred);
@@ -41,6 +55,17 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm, LayerRecorde
     //Lambda captures event on button click and calls function
     prevButton.onClick = [this] {prevButtonClickResponse(); };
 
+    addAndMakeVisible(&audioPositionSlider);
+    audioPositionSlider.setRange(0, 0.1);
+    audioPositionSlider.setTextValueSuffix(" Sec");
+    audioPositionSlider.setNumDecimalPlacesToDisplay(3);
+    //Sets the entire component with a slider listener
+    audioPositionSlider.addListener(this);
+    //Slider's label
+    addAndMakeVisible(&sliderLabel);
+    sliderLabel.setText("Position", juce::dontSendNotification);
+    sliderLabel.attachToComponent(&audioPositionSlider, true);
+
     addAndMakeVisible(&playButton);
     playButton.setButtonText("Play");
     playButton.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
@@ -62,50 +87,67 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm, LayerRecorde
     audioFormatManager.registerBasicFormats();
     //Listener for transport source changes
     transport.addChangeListener (this);
-
 }
 
 /**
-* Mixdown folder destructor.
+* Destructor
+* @see MixdownFolder.h
 */
-MixdownFolderComp::~MixdownFolderComp() {}
+MixdownFolderComp::~MixdownFolderComp() 
+{
+    transport.setSource(nullptr);
+    tn->removeChangeListener(this);
+}
+
+/*
+  ==============================================================================
+
+    AUDIO METHODS
+
+  ==============================================================================
+*/
 
 /**
-* Function sets up the transport source.
-* 
-* @param samplesPerBlockExpected  Number of samples per block to be loaded in.
-* @param sampleRate  Expected sample rate of files.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
     transport.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
-/*
-* Function gets the next audio block of the current audio file.
-* 
-* @param bufferToFill  A buffer that holds audio blocks from a selected audio file, in form
-*   AudioSourceChannelInfo object.
+/**
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) {
+    //Clear buffer region to fill in new buffer with audio chunks
     if (reader.get() == nullptr) {
         bufferToFill.clearActiveBufferRegion();
         return;
     }
     transport.getNextAudioBlock(bufferToFill);
+    //audioPositionSlider.setNumDecimalPlacesToDisplay(3);
+    //audioPositionSlider.setValue(round(transport.getCurrentPosition() * 10000.0)/10000.0);
 }
 
 /**
-* Function releases resources when they are no longer needed.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::releaseResources() { transport.releaseResources(); }
 
-/**
-* Callback function that projects changes audio transport source.
-* Changes come in the form of state changes.
-* 
-* @param source  Changebroadcaster that sends messages to related classes.
+/*
+  ==============================================================================
+
+    CHANGE LISTENER CALLBACK METHODS
+  ==============================================================================
 */
-void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) {
+
+/**
+* @see MixdownFolder.h
+*/
+void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster* source) {
+    if (source == tn.get()) {
+        showAudioResource(URL(tn->getLastDroppedFile()));
+    }
+
     if (source == &transport) {
         if (transport.isPlaying()) {
             stateChange(Playing);
@@ -118,15 +160,7 @@ void MixdownFolderComp::changeListenerCallback(juce::ChangeBroadcaster *source) 
 }
 
 /**
-* Function facilitates state change via changing button text and availability,
-* as well as sets playback track time position.
-* state.Stopped represents an unplayed track or unloaded state.
-* state.Starting represents playing an unplayed track.
-* state.Playing represents a currently played track.
-* state.Pausing represents pausing a currently played track.
-* state.Paused represents a currently paused track.
-* 
-* @param newState  Accepts a TransportState that is an enumeration of MixdownFolder states.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::stateChange(TransportState newState) {
     if (state != newState) {
@@ -138,6 +172,7 @@ void MixdownFolderComp::stateChange(TransportState newState) {
                 stopButton.setButtonText("Stop");
                 stopButton.setEnabled(false);
                 transport.setPosition(0.0);
+                audioPositionSlider.setValue(0);
                 break;
 
             case Starting:
@@ -172,9 +207,16 @@ void MixdownFolderComp::triggerPlayback() {
 }
 
 /**
-* Function updates dropdown bar with selected audio file and primes playback.
-* Component state is reverted to state.Stopped if it has been changed.
-* Called by "Select folder" button onChange event listener.
+* @see MixdownFolder.h
+*/
+void MixdownFolderComp::sliderValueChanged(juce::Slider* slider) {
+    if (slider == &audioPositionSlider) {
+        transport.setPosition(audioPositionSlider.getValue());
+    }
+}
+
+/**
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
@@ -196,6 +238,14 @@ void MixdownFolderComp::fileBoxMenuChanged() {
 
         //fileReader->sampleRate handles hardware file sample rate match up
         transport.setSource(tempReader.get(), 0, nullptr, fileReader->sampleRate);
+
+        //audioPositionSlider.setValue(0);
+        //audioPositionSlider.setRange(0, (fileReader->lengthInSamples / fileReader->sampleRate));
+
+        juce::URL* url = new juce::URL(selected.getMixdownFile());
+        juce::URL& url2 = *url;
+        tn->setURL(url2);
+
         playButton.setEnabled(true);
 
         reader.reset(tempReader.release());
@@ -214,9 +264,16 @@ void MixdownFolderComp::fileBoxMenuChanged() {
     }
 }
 
+/*
+  ==============================================================================
+
+    BUTTON CLICK RESPONSES
+
+  ==============================================================================
+*/
+
 /**
-* Function opens a directory to query user directory selection.
-* Audio files are loaded into fileBoxMenu
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::fileButtonClickResponse() {
     juce::FileChooser fileChooser("Choose a mixdown folder");
@@ -224,6 +281,7 @@ void MixdownFolderComp::fileButtonClickResponse() {
     if (fileChooser.browseForDirectory()) {
         juce::File myDirectory;
         myDirectory = fileChooser.getResult();
+
         fileBoxMenu.clear();
         projects = ProjectManagement::getAllProjectsInFolder(myDirectory);
 
@@ -240,9 +298,7 @@ void MixdownFolderComp::fileButtonClickResponse() {
 }
 
 /**
-* Function selects the next track in the loaded mixdown folder.
-* Component state is reverted to state.Stopped if it has been changed.
-* Called by "Next" button onClick event listener.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::nextButtonClickResponse() {
     TransportState lastState = state;
@@ -251,6 +307,7 @@ void MixdownFolderComp::nextButtonClickResponse() {
     }
 
     int currentID = fileBoxMenu.getSelectedId();
+    //Set unique ids for indices inside fileBoxMenu
     fileBoxMenu.setSelectedId(currentID + 1);
 
     //Last possible choice is the final track in the folder.
@@ -268,9 +325,7 @@ void MixdownFolderComp::nextButtonClickResponse() {
 }
 
 /**
-* Function selects the previous track in the loaded mixdown folder.
-* Component state is reverted to state.Stopped if it has been changed.
-* Called by "Prev" button onClick event listener.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::prevButtonClickResponse() {
     TransportState lastState = state;
@@ -297,10 +352,7 @@ void MixdownFolderComp::prevButtonClickResponse() {
 }
 
 /**
-* Function changes component state to state.Starting or state.Pausing.
-* Called by "Play"/"Resume" button onClick event listener.
-* "Resume" starts the playback from the last stop.
-* "Play" starts the playback.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::playButtonClickResponse() {
     if ((state == Stopped) || (state == Paused)) {
@@ -312,10 +364,7 @@ void MixdownFolderComp::playButtonClickResponse() {
 }
 
 /**
-* Function changes component state to state.Stopped or state.Stopping.
-* Called by "Stop"/"Reset" button onClick event listener.
-* "Reset" restarts the playback from the start.
-* "Stop" stops the playback.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::stopButtonClickResponse() {
     if (state == Paused) {
@@ -325,33 +374,44 @@ void MixdownFolderComp::stopButtonClickResponse() {
     }
 }
 
+/*
+  ==============================================================================
+
+    REDRAW METHODS
+
+  ==============================================================================
+*/
+
 /**
-* Function redraws parts of component that require updates.
-* Called when a part of the MixDownFolder component requires redrawing.
-* 
-* @param g  The graphics context passed to this class for any drawing.
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::paint(juce::Graphics& g) {
     // backgroundColourId is an enumeration for default grey background color.
     g.fillAll (juce::Component::getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
-
 /**
-* Function resizes the dimensions of component dynamically to parent size.
-* Called everytime the MixDownFolder component size is changed. 
+* @see MixdownFolder.h
 */
 void MixdownFolderComp::resized() {
     
     auto area = getLocalBounds();
     
+    // playback thumbnail and slider
+    auto r = area.removeFromTop(165);
+    tn->setBounds(r.removeFromTop(140));
+    auto zoom = r.removeFromTop(25);
+    zoomSlider.setBounds(zoom);
+    
+    //Scaled to the parent window view
     fileButton.setBounds(area.removeFromTop(41).reduced(8));
     fileBoxMenu.setBounds(area.removeFromTop(41).reduced(8));
     
+    // transport buttons
     juce::Grid prevNextGrid;
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
-    
+
     prevNextGrid.templateRows = { Track (Fr (1)), Track (Fr (1)) };
     prevNextGrid.templateColumns = { Track (Fr (1)), Track (Fr (1)) };
     
@@ -362,6 +422,29 @@ void MixdownFolderComp::resized() {
     
     prevNextGrid.setGap(juce::Grid::Px(12));
     
-    prevNextGrid.performLayout(area.removeFromTop(76).reduced(8));
+    prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
     
+}
+
+
+/*
+  ==============================================================================
+
+    HELPER METHODS
+
+  ==============================================================================
+*/
+
+
+/*
+* Function rounds a given number in the form val = (val * 10^decimals)
+* Example : val * 10000.0 means that we round the fourths place
+* 
+* @param val  The double value that is being rounded
+* @return double  A value that has been rounded up or down to nearest decimals place.
+*/
+inline double round(double val)
+{
+    if (val < 0) return ceil(val - 0.5);
+    return floor(val + 0.5);
 }
