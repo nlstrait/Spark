@@ -19,7 +19,8 @@
 * Constructor inherits from Audio device manager and state enumeration
 * @see MixdownFolder.h
 */
-MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceManager(adm), state(Stopped) {
+
+MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm, LayerRecorderComponent& layerRecorder) : deviceManager(adm), state(Stopped), layerRecorder(layerRecorder) {
     addAndMakeVisible(zoomSlider);
     zoomSlider.setRange(0, 1, 0);
     zoomSlider.onValueChange = [this] { tn->setZoomFactor(zoomSlider.getValue()); };
@@ -31,7 +32,7 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
     tn->addChangeListener(this);
 
     thread.startThread(3);
-
+    
     addAndMakeVisible(&fileBoxMenu);
     fileBoxMenu.setJustificationType(juce::Justification::centred);
     //Lambda captures event on bar change and calls function
@@ -44,7 +45,7 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
 
     addAndMakeVisible(&nextButton);
     nextButton.setButtonText("Next");
-    nextButton.setEnabled(true);
+    nextButton.setEnabled(false);
     //Lambda captures event on button click and calls function
     nextButton.onClick = [this] {nextButtonClickResponse(); };
 
@@ -76,7 +77,10 @@ MixdownFolderComp::MixdownFolderComp(juce::AudioDeviceManager& adm) : deviceMana
     stopButton.setButtonText("Stop");
     stopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
     //Lambda captures event on button click and calls function
-    stopButton.onClick = [this] {stopButtonClickResponse(); };
+    stopButton.onClick = [this] {
+        stopButtonClickResponse();
+        this->layerRecorder.stopRecording();
+    };
     stopButton.setEnabled(false);
 
     //Registers the basic format of WAV and RIFF files
@@ -197,6 +201,11 @@ void MixdownFolderComp::stateChange(TransportState newState) {
     }
 }
 
+void MixdownFolderComp::triggerPlayback() {
+    if (state != Playing)
+        playButton.triggerClick();
+}
+
 /**
 * @see MixdownFolder.h
 */
@@ -211,10 +220,17 @@ void MixdownFolderComp::sliderValueChanged(juce::Slider* slider) {
 */
 void MixdownFolderComp::fileBoxMenuChanged() {
     int fileID = fileBoxMenu.getSelectedId();
+    if (fileID == 0) return;
     //fileBoxMenu indices starts at 1 but array indices start at 0
-    selectedAudioFile = audioFiles[fileID-1]; 
+    Project& selected = projects.getReference(fileID-1);
+    layerRecorder.setProject(&selected);
+    if (layerRecorder.isRecording()) {
+        // continue recording, but for new project
+        layerRecorder.stopRecording();
+        layerRecorder.startRecording();
+    }
     
-    juce::AudioFormatReader* fileReader = audioFormatManager.createReaderFor(selectedAudioFile);
+    juce::AudioFormatReader* fileReader = audioFormatManager.createReaderFor(selected.getMixdownFile());
 
     if (fileReader != nullptr) {
         std::unique_ptr< juce::AudioFormatReaderSource>
@@ -235,15 +251,11 @@ void MixdownFolderComp::fileBoxMenuChanged() {
         reader.reset(tempReader.release());
     }
 
-    if (state != Stopped) {
-        stateChange(Stopped);
-    }
-
     //Set bounds of next/prev buttons
-    if (fileBoxMenu.getSelectedId() == audioFiles.size()) {
+    if (fileBoxMenu.getSelectedId() == projects.size()) {
         nextButton.setEnabled(false);
         prevButton.setEnabled(true);
-    } else if (fileBoxMenu.getSelectedId() == 0) {
+    } else if (fileBoxMenu.getSelectedId() <= 1) {
         nextButton.setEnabled(true);
         prevButton.setEnabled(false);
     } else {
@@ -264,23 +276,23 @@ void MixdownFolderComp::fileBoxMenuChanged() {
 * @see MixdownFolder.h
 */
 void MixdownFolderComp::fileButtonClickResponse() {
-    //"userMusicDirectory" redirects to windows default music directory
-    juce::FileChooser fileChooser("Choose a mixdown folder",
-        juce::File::getSpecialLocation(juce::File::userMusicDirectory));
-
+    juce::FileChooser fileChooser("Choose a mixdown folder");
     //Awaits user directory selection
     if (fileChooser.browseForDirectory()) {
         juce::File myDirectory;
         myDirectory = fileChooser.getResult();
 
-        //Only wav files are allowed
-        myDirectory.findChildFiles(audioFiles, juce::File::findFiles, true, "*.wav");
-
-        //Clear file box to reset indices
         fileBoxMenu.clear();
-        for (int i = 0; i < audioFiles.size(); i++) {
+        projects = ProjectManagement::getAllProjectsInFolder(myDirectory);
+
+        for (int i = 0; i < projects.size(); i++) {
             //fileBoxMenu indices starts at 1 but array indices start at 0
-            fileBoxMenu.addItem(audioFiles[i].getFileName(), i + 1);
+            fileBoxMenu.addItem(projects[i].getName(), i + 1);
+        }
+        if (projects.size() > 0) {
+            nextButton.setEnabled(true);
+            // load up the first project
+            nextButton.triggerClick();
         }
     }
 }
@@ -289,6 +301,7 @@ void MixdownFolderComp::fileButtonClickResponse() {
 * @see MixdownFolder.h
 */
 void MixdownFolderComp::nextButtonClickResponse() {
+    TransportState lastState = state;
     if (state != Stopped) {
         stateChange(Stopped);
     }
@@ -298,19 +311,24 @@ void MixdownFolderComp::nextButtonClickResponse() {
     fileBoxMenu.setSelectedId(currentID + 1);
 
     //Last possible choice is the final track in the folder.
-    if (fileBoxMenu.getSelectedId() == audioFiles.size()) {
+    if (fileBoxMenu.getSelectedId() == projects.size()) {
         nextButton.setEnabled(false);
         prevButton.setEnabled(true);
     } else {
         nextButton.setEnabled(true);
         prevButton.setEnabled(true);
     }
+    
+    // Continue playing (begin playing new track seemlessly)
+    if (lastState == Playing)
+        playButton.triggerClick();
 }
 
 /**
 * @see MixdownFolder.h
 */
 void MixdownFolderComp::prevButtonClickResponse() {
+    TransportState lastState = state;
     if (state != Stopped) {
         stateChange(Stopped);
     }
@@ -319,12 +337,17 @@ void MixdownFolderComp::prevButtonClickResponse() {
     fileBoxMenu.setSelectedId(currentID - 1);
 
     //First possible choice is no track.
-    if (fileBoxMenu.getSelectedId() == 0) {
+    if (fileBoxMenu.getSelectedId() <= 1) {
         nextButton.setEnabled(true);
         prevButton.setEnabled(false);
     } else {
         nextButton.setEnabled(true);
         prevButton.setEnabled(true);
+    }
+    
+    if (lastState == Playing) {
+        // Continue playing (begin playing new track seemlessly)
+        playButton.triggerClick();
     }
 }
 

@@ -16,12 +16,14 @@ MainComponent::MainComponent()
                   false, // ability to select midi output devi
                   false, // treat channels as stereo pairs
                   true),// hide advanced options
-        recorderComponent(deviceManager),
-        mixdownFolderComp(deviceManager)
+        layerRecorderComp(deviceManager),
+        mixdownFolderComp(deviceManager, layerRecorderComp)
     {
-            
-    addAndMakeVisible(recorderComponent);
         
+    addAndMakeVisible(layerRecorderComp);
+    // This is certainly bad practice, but alternatives require radical redesign
+    layerRecorderComp.setTransport(mixdownFolderComp.getTransportPtr());
+    layerRecorderComp.setPlaybackComp(&mixdownFolderComp);
     addAndMakeVisible(audioSetupComp);
         
     addAndMakeVisible(mixdownFolderComp);
@@ -39,7 +41,6 @@ MainComponent::MainComponent()
     
     setAudioChannels(2, 2); // This could be more sophisticated to handle unconvential input/output setups
     deviceManager.addChangeListener(this);
-    
 }
 
 /**
@@ -84,7 +85,7 @@ void MainComponent::resized() {
     grid.templateColumns = { Track (Fr (4)), Track (Fr (3)) };
     
     grid.items = {
-        juce::GridItem(recorderComponent), juce::GridItem(audioSetupComp),
+        juce::GridItem(layerRecorderComp), juce::GridItem(audioSetupComp),
         juce::GridItem(mixdownFolderComp)
     };
     

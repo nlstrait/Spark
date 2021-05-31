@@ -15,6 +15,9 @@
 #include "ThumbnailComp.h"
 #include "DemoUtilities.h"
 
+#include "ProjectManagement.h"
+#include "AudioRecorder.h"
+
 class MixdownFolderComp :   public juce::Component,
                             public juce::AudioSource,
                             public juce::Slider::Listener,
@@ -39,8 +42,8 @@ public:
     /**
     * Acts as constructor to set up necessary variables and functions.
     */
-    MixdownFolderComp(juce::AudioDeviceManager& adm);
-
+    MixdownFolderComp(juce::AudioDeviceManager& adm, LayerRecorderComponent& layerRecorder);
+    
     /**
     * Mixdown folder destructor.
     */
@@ -87,6 +90,10 @@ public:
     * Called everytime the MixDownFolder component size is changed.
     */
     void resized() override;
+                                
+    juce::AudioTransportSource* getTransportPtr() { return &(this->transport); }
+                                
+    void triggerPlayback();
 
  /*
    ==============================================================================
@@ -121,6 +128,8 @@ private:
     juce::AudioFormatManager audioFormatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> reader;
     juce::AudioTransportSource transport;
+                                
+    LayerRecorderComponent& layerRecorder;
 
     /**
     * Callback function that projects changes audio transport source.
@@ -144,8 +153,7 @@ private:
     void stateChange(TransportState newState);
 
     //Saved audio files for id tracking and file storage
-    juce::Array<juce::File> audioFiles;
-    juce::File selectedAudioFile;
+    juce::Array<Project> projects;
 
     //Audio file storage and event response
     juce::ComboBox fileBoxMenu;

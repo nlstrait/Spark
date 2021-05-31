@@ -72,7 +72,7 @@ private:
     * These are the components that all make up the JUCE main component
     */
     juce::AudioDeviceSelectorComponent audioSetupComp;
-    AudioRecorderComponent recorderComponent;
+    LayerRecorderComponent layerRecorderComp;
     MixdownFolderComp mixdownFolderComp;
     juce::TextEditor diagnosticsBox;
     
