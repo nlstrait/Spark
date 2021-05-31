@@ -397,14 +397,15 @@ void MixdownFolderComp::resized() {
     
     auto area = getLocalBounds();
     
+    fileButton.setBounds(area.removeFromTop(41).reduced(8));
+
     // playback thumbnail and slider
     auto r = area.removeFromTop(165);
     tn->setBounds(r.removeFromTop(140));
     auto zoom = r.removeFromTop(25);
-    zoomSlider.setBounds(zoom);
+    zoomSlider.setBounds(zoom);    
     
     //Scaled to the parent window view
-    fileButton.setBounds(area.removeFromTop(41).reduced(8));
     fileBoxMenu.setBounds(area.removeFromTop(41).reduced(8));
     
     // transport buttons
@@ -421,9 +422,7 @@ void MixdownFolderComp::resized() {
     };
     
     prevNextGrid.setGap(juce::Grid::Px(12));
-    
     prevNextGrid.performLayout(area.removeFromTop(80).reduced(8));
-    
 }
 
 

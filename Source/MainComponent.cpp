@@ -81,12 +81,12 @@ void MainComponent::resized() {
     using Track = juce::Grid::TrackInfo;
     using Fr = juce::Grid::Fr;
     
-    grid.templateRows    = { Track (Fr (1)), Track (Fr (2)) };
+    grid.templateRows    = { Track (Fr (2)), Track (Fr (1)) };
     grid.templateColumns = { Track (Fr (4)), Track (Fr (3)) };
     
     grid.items = {
-        juce::GridItem(layerRecorderComp), juce::GridItem(audioSetupComp),
-        juce::GridItem(mixdownFolderComp)
+        juce::GridItem(mixdownFolderComp), juce::GridItem(audioSetupComp),
+        juce::GridItem(layerRecorderComp)
     };
     
     auto rect = getLocalBounds();
