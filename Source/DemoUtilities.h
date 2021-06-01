@@ -1,3 +1,15 @@
+/*
+  ==============================================================================
+
+    DemoUtilities.h
+    Created: 30 May 2021
+    Author: Tuan Thai
+
+    DemoUtilities taken from JUCE examples. Practically a compiled list of many useful 
+    functions and helps to give developers general expectations from GUI and functionality.
+  ==============================================================================
+*/
+
 #pragma once
 
 #include <JuceHeader.h>

@@ -1,3 +1,15 @@
+/*
+  ==============================================================================
+
+    ThumbnailComp.h
+    Created: 31 May 2021
+    Author: Tuan Thai
+
+    ThumbnailComp represents an area that emcompasses both the waveform slider
+    generator but also the drop in file menu.
+  ==============================================================================
+*/
+
 #pragma once
 
 #include <JuceHeader.h>
