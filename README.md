@@ -25,10 +25,7 @@ JUCE project configuration. Necessary for managing Spark through the Projucer.
 ## Building and Developing with JUCE
 Spark is largely a [JUCE](https://juce.com/)-based project. Since JUCE is such a heavy framework, building and running Spark (as well as our prototypes) requires first setting up and getting a little familiar with JUCE and its project manager, Projucer. Follow [this JUCE guide](https://docs.juce.com/master/tutorial_new_projucer_project.html) to do so. Once JUCE is installed, you can open a `*.jucer` file using the Projucer to setup a project and open it in an IDE of your choice. 
 
-If you don't want to build the project using your IDE, we've provided a bash script for MacOS to build the project. To build the executable, open `Spark.jucer` using Projucer, and save the project in Projucer (under "Files"). After that, simply run `./build.sh`; it'll automatically open up the built executable after the script finishes running. After building once, if you want to just run the executable, it'll be located in `Builds/MacOSX/build/debug/Spark.app/Contents/MacOS/`
-WARNING: this script uses sudo to install and enable xcode command line tools.
-
-You can also build this project using CMake with Ninja. We recommend using [FRUT](https://github.com/McMartin/FRUT) to generate the CMakeLists.txt file for this project and following the instructions there.
+If you don't want to build the project using an IDE (which is the recommended way for developers), you can also build this project using CMake with Ninja on all of Windows, Mac and Linux. We heavily recommend using [FRUT](https://github.com/McMartin/FRUT) to generate the CMakeLists.txt file for this project and following the instructions listed there.
 
 ## Testing
 Currently, our testing is done through a separate JUCE project, as the JUCE unit testing framework requires us to do so. The testing project's repository is located at: https://github.com/jaygrinols/Spark-Testing
