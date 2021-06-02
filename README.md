@@ -23,7 +23,7 @@ An example folder holding mixdowns. For use in quickly testing Spark.
 JUCE project configuration. Necessary for managing Spark through the Projucer.
 
 ## Building and Developing with JUCE
-Spark is largely a [JUCE](https://juce.com/)-based project. Since JUCE is such a heavy framework, building and running Spark (as well as our prototypes) requires first setting up and getting a little familiar with JUCE and its project manager, Projucer. Follow [this JUCE guide](https://docs.juce.com/master/tutorial_new_projucer_project.html) to do so. Once JUCE is installed, you can open a `*.jucer` file using the Projucer to setup a project and open it in an IDE of your choice. 
+Spark is largely a [JUCE](https://juce.com/)-based project. Since JUCE is such a heavy framework, building and running Spark (as well as our prototypes) requires first setting up and getting a little familiar with JUCE and its project manager, Projucer. Follow [this JUCE guide](https://docs.juce.com/master/tutorial_new_projucer_project.html) to do so. Once JUCE is installed, you can open a `*.jucer` file using the Projucer to setup a project and open it in a supported IDE of your choice, from where you can easily build the project directly within the IDE. 
 
 If you don't want to build the project using an IDE (which is the recommended way for developers), you can also build this project using CMake with Ninja on all of Windows, Mac and Linux. We heavily recommend using [FRUT](https://github.com/McMartin/FRUT) to generate the CMakeLists.txt file for this project and following the instructions listed there.
 
