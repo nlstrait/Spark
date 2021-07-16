@@ -3,6 +3,8 @@
 ## Overview
 Creators shouldn't have to open an entire heavy-weight DAW (Digital Audio Workstation) to record new material for existing projects. Spark aims to eliminate friction in the music production process by enabling creators to easily browse through mixdowns and quickly capture inspired additions.
 
+[Final Release Demo & Reflection](https://youtu.be/rCKlBUKajjM)
+
 ## User Documentation
 If you are not a developer and would just like to use Spark, please [see our User Documentation here](https://docs.google.com/document/d/1uvdGcDdwmmioiQLi-uWVZDDIGqzRN33mTG3bzXqQsGM/edit?usp=sharing).
 
